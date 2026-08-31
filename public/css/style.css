@@ -158,15 +158,16 @@ body{
 @keyframes pulsebar{50%{opacity:.6}}
 .timerbar .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:900;letter-spacing:.06em}
 
-.gamebody{display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px;--online-side:0px}
+.gamebody{position:relative;display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px;--online-side:0px}
 .boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:2px 8px}
 .board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bs);
   grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--cols),1fr)}
-.online-tools{display:none;flex:0 0 300px;min-height:0;flex-direction:column;gap:10px;overflow:hidden;padding:2px 4px 0 0}
-#s-game.online-mode .online-tools{display:flex}
-#s-game.online-mode .gamebody{--online-side:300px}
+.online-tools{display:none;position:absolute;inset:0;z-index:5;pointer-events:none;padding:8px 10px;overflow:hidden}
+#s-game.online-mode .online-tools{display:block}
+#s-game.online-mode .gamebody{--online-side:0px}
 #s-game.online-mode .boardwrap{transform:translateX(calc(var(--online-side) / 2))}
-.summary-card{display:flex;flex-direction:column;min-height:0;background:#FFFDF8;border:3px solid var(--ink);border-radius:18px;padding:10px;box-shadow:0 4px 0 rgba(91,70,54,.12)}
+.online-tools > *{pointer-events:auto}
+.summary-card{position:absolute;top:8px;right:10px;width:clamp(220px,23vw,300px);max-height:46%;display:flex;flex-direction:column;min-height:0;background:#FFFDF8;border:3px solid var(--ink);border-radius:18px;padding:10px;box-shadow:0 4px 0 rgba(91,70,54,.12)}
 .summary-head{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px dashed #E9DDCF;padding:0 2px 7px;font-size:.9rem}
 .summary-head span{font-size:.74rem;color:var(--ink-soft);font-weight:800;white-space:nowrap}
 .summary-players{display:flex;flex-direction:column;gap:5px;padding:8px 0}
@@ -179,7 +180,7 @@ body{
 .summary-player .sp-score{font-size:1.1rem;font-weight:900;color:var(--pink-d);min-width:1.1em;text-align:center}
 .summary-feed{display:flex;flex-direction:column;gap:4px;overflow-y:auto;min-height:52px;font-size:.76rem;color:var(--ink-soft);border-top:2px dashed #E9DDCF;padding-top:7px}
 .summary-feed p{margin:0;padding:4px 6px;background:#fff;border-radius:8px;overflow-wrap:anywhere}
-.game-chat{display:flex;flex:1;min-height:220px;flex-direction:column}
+.game-chat{position:absolute;left:10px;bottom:8px;width:clamp(220px,23vw,300px);height:clamp(180px,42%,280px);display:flex;flex:none;min-height:0;flex-direction:column}
 .game-chat .chatlog{flex:1;max-height:none}
 
 .card{position:relative;perspective:800px;cursor:pointer}
@@ -266,12 +267,10 @@ body{
   .optcard{flex:1 1 100px;min-width:96px;padding:10px 6px}
   .optcard .t{display:none}
   .logo{max-width:340px}
-  .online-tools{flex-basis:230px}
   .gamebody{gap:6px;padding-left:6px;padding-right:6px}
 }
 @media (min-width:821px) and (max-width:1100px){
-  .online-tools{flex-basis:250px}
-  #s-game.online-mode .gamebody{--online-side:250px}
+  #s-game.online-mode .gamebody{--online-side:0px}
 }
 @media (max-width:560px){
   .seats{gap:8px}
@@ -282,8 +281,8 @@ body{
   .invitebar label{width:100%}
   .invitebar input{flex-basis:calc(100% - 100px)}
   #s-game.online-mode .gamebody{flex-direction:column;--online-side:0px}
-  #s-game.online-mode .online-tools{display:grid;grid-template-columns:1fr 1.2fr;flex:0 0 168px;width:100%;gap:6px;padding:0 2px 2px}
-  .summary-card,.game-chat{min-height:0}
+  #s-game.online-mode .online-tools{position:static;display:grid;grid-template-columns:1fr 1.2fr;flex:0 0 168px;width:100%;height:auto;gap:6px;padding:0 2px 2px;pointer-events:auto;overflow:hidden}
+  .summary-card,.game-chat{position:static;width:auto;height:auto;min-height:0}
   .summary-feed{max-height:57px}
   .game-chat{min-height:0}
 }
