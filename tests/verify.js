@@ -138,6 +138,8 @@ const matchedOwnerMarks = gameSource.match(/markMatched\([ab], byId\)/g) || [];
 assert.strictEqual(matchedOwnerMarks.length, 4, '單機與線上配對成功時都必須標記兩張牌的玩家歸屬');
 assert.ok(styleSource.includes('.card.matched .fc.back{visibility:hidden}'), '已配對牌必須隱藏牌背');
 assert.ok(styleSource.includes('.card.matched .fc.front{z-index:2;transform:none}'), '已配對牌必須固定顯示正面');
+assert.ok(styleSource.includes('.online-tools{display:none;flex:0 0 300px'), '線上遊戲側欄必須保留足夠寬度');
+assert.ok(styleSource.includes('.game-chat{display:flex;flex:1;min-height:220px'), '對戰聊天室必須保留足夠高度');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 const serverSource = read(path.join(root, 'server.js'));
