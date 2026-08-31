@@ -279,6 +279,16 @@ body{
 @media (min-width:821px) and (max-width:1100px){
   #s-game.online-mode .gamebody{--online-side:0px}
 }
+@media (max-width:1100px), (max-height:760px){
+  .gbar{padding:4px 8px 0}
+  .gbar .btn3d.small{min-height:40px;padding:7px 12px calc(7px + var(--d))}
+  .scorebar{gap:8px;padding:4px 8px 2px}
+  .pcard{gap:7px;padding:5px 12px}
+  .timerbar{margin:2px auto 4px}
+  .gamebody{gap:4px;padding:0 4px 2px}
+  .boardwrap{padding:0 4px}
+  .gfoot{padding:4px 10px 8px}
+}
 @media (max-width:560px){
   .seats{gap:8px}
   .seat{padding:10px}

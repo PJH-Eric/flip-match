@@ -161,6 +161,7 @@ assert.ok(styleSource.includes('.summary-card{position:absolute;top:8px;right:10
 assert.ok(styleSource.includes('.game-chat{position:absolute;left:10px;bottom:8px;') && styleSource.includes('#s-game.online-mode.chat-open .game-chat{display:flex;'), '對戰聊天室必須預設隱藏並在左下角展開');
 assert.ok(styleSource.includes('.chat-toggle{display:none}') && styleSource.includes('#s-game.online-mode .chat-toggle{display:inline-flex}'), '聊天室按鈕只應在對戰中顯示');
 assert.ok(styleSource.includes('.sound-toggle::after') && styleSource.includes('.sound-toggle.off::after{content:"✕"'), '關閉音樂或音效時必須顯示 X 標記');
+assert.ok(styleSource.includes('@media (max-width:1100px), (max-height:760px)') && styleSource.includes('.gbar{padding:4px 8px 0}') && styleSource.includes('.gamebody{gap:4px;padding:0 4px 2px}'), '小視窗必須壓縮外框留白並放大可操作棋盤');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
