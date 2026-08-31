@@ -9,6 +9,12 @@
   function emit(evt, a, b) { (handlers[evt] || []).forEach(function (f) { try { f(a, b); } catch (e) { console.error(e); } }); }
 
   function url() {
+    // config.js 有指定伺服器（例如部署在 Render）就連過去，否則連同一台主機
+    var cfg = (w.FLIP_MATCH_SERVER || '').trim();
+    if (cfg) {
+      var base = cfg.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+      return base.replace(/\/+$/, '') + '/';
+    }
     var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
     return proto + location.host + '/';
   }

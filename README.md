@@ -79,5 +79,29 @@ flip-match/
 4. 之後每次 push 到 `main` 就會自動重新佈署，網址是
    `https://<你的帳號>.github.io/flip-match/`。
 
-> ⚠️ GitHub Pages 只能提供靜態檔案，**「線上對戰」在 Pages 上無法使用**（需要 `server.js` 的 WebSocket 伺服器）。
-> 線上頁面可以正常玩「單機挑戰」與「對戰電腦」；要玩線上對戰請照上面的說明在自己電腦跑 `啟動遊戲.bat`。
+## 佈署線上對戰伺服器到 Render
+
+GitHub Pages 只能放靜態檔案，跑不了 WebSocket，所以 `server.js` 另外部署到 [Render](https://render.com)。
+本專案已內建 `render.yaml` 藍圖設定。
+
+1. 登入 Render → **New → Blueprint** → 選這個 GitHub repository → **Apply**。
+   （或用 **New → Web Service**，Build Command 留 `npm install`，Start Command 填 `node server.js`。）
+2. 建好之後會拿到一組網址，例如 `https://flip-match.onrender.com`。
+3. 把這組網址填回 `public/js/config.js` 的 `REMOTE`，然後 push：
+   ```js
+   var REMOTE = 'https://你的服務名稱.onrender.com';
+   ```
+4. push 到 `main` 後 GitHub Pages 會自動重新佈署，線上對戰就會連到 Render。
+
+### 連線規則
+
+`public/js/config.js` 會自動判斷：
+
+| 從哪裡開啟 | 線上對戰連到 |
+|------------|--------------|
+| `localhost` / 區網 IP（自己跑 `啟動遊戲.bat`） | 同一台主機，跟以前一樣 |
+| GitHub Pages 或直接開 `index.html` | Render 上的伺服器 |
+
+> ⚠️ Render 免費方案在閒置約 15 分鐘後會休眠，**第一次連線可能要等 30～60 秒**才會醒來，
+> 期間畫面會顯示「連線中斷」並自動重試，醒來後就會連上。
+> 免費方案每月有執行時數上限，兩人對戰的流量很小，一般不會用完。
