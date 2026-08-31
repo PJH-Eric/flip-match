@@ -55,6 +55,46 @@ Object.values(sandbox.REALISTIC_CODEPOINTS).flat().filter((code) => code !== '-'
   assert.ok(fs.existsSync(path.join(publicDir, 'assets', 'noto', `emoji_u${code}.svg`)), `找不到百科式圖示資源：${code}`);
 });
 
+const realisticAsset = (deckId, iconId) => {
+  const index = sandbox.DECKS[deckId].icons.findIndex((icon) => icon.id === iconId);
+  assert.notStrictEqual(index, -1, `找不到 ${deckId} 牌面：${iconId}`);
+  return sandbox.REALISTIC_CODEPOINTS[deckId][index];
+};
+[
+  ['vehicles', 'motorbike', '1f3cd'],
+  ['vehicles', 'scooter', '1f6f5'],
+  ['vehicles', 'skateboard', '1f6f9'],
+  ['vehicles', 'train', '1f686'],
+  ['vehicles', 'steamtrain', '1f682'],
+  ['vehicles', 'tram', '1f68a'],
+  ['vehicles', 'subway', '1f687'],
+  ['vehicles', 'hsr', '1f684'],
+  ['vehicles', 'airplane', '2708'],
+  ['vehicles', 'helicopter', '1f681'],
+  ['vehicles', 'rocket', '1f680'],
+  ['vehicles', 'ufo', '1f6f8'],
+  ['vehicles', 'balloon', '1f388'],
+  ['vehicles', 'sailboat', '26f5'],
+  ['vehicles', 'ship', '1f6a2'],
+  ['vehicles', 'submarine', '-'],
+  ['stationery', 'ruler', '1f4d0'],
+  ['stationery', 'triangle', '1f4cf'],
+  ['stationery', 'compass', '1f9ed'],
+  ['stationery', 'scissors', '2702'],
+  ['stationery', 'clip', '1f4ce'],
+  ['stationery', 'pushpin', '1f4cc'],
+  ['stationery', 'notebook', '1f4d3'],
+  ['stationery', 'book', '1f4d6'],
+  ['stationery', 'folder', '1f4c1'],
+  ['stationery', 'stickynote', '1f4dd'],
+  ['stationery', 'envelope', '2709'],
+  ['stationery', 'backpack', '1f392'],
+  ['stationery', 'palette', '1f3a8'],
+  ['stationery', 'globe', '1f30e']
+].forEach(([deckId, iconId, expected]) => {
+  assert.strictEqual(realisticAsset(deckId, iconId), expected, `${deckId}/${iconId} 的百科圖示對應錯誤`);
+});
+
 vm.runInContext(read(path.join(publicDir, 'js', 'game.js')), sandbox, { filename: 'game.js' });
 [
   [4, 8],
