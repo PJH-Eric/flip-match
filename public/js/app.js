@@ -40,21 +40,20 @@
   }
 
   function appendChat(m) {
-    ['room-chatlog', 'game-chatlog'].forEach(function (id) {
-      var host = q(id);
-      if (!host) return;
-      var item = D.createElement('div');
-      item.className = 'chatmsg' + (m.fromId && m.fromId === w.Net.id() ? ' mine' : '');
-      var name = D.createElement('b');
-      name.textContent = m.from || '玩家';
-      var body = D.createElement('span');
-      body.textContent = String(m.m || '');
-      item.appendChild(name);
-      item.appendChild(body);
-      host.appendChild(item);
-      while (host.children.length > 30) host.removeChild(host.firstChild);
-      host.scrollTop = host.scrollHeight;
-    });
+    var targetId = cur === 's-game' ? 'game-chatlog' : 'room-chatlog';
+    var host = q(targetId);
+    if (!host) return;
+    var item = D.createElement('div');
+    item.className = 'chatmsg' + (m.fromId && m.fromId === w.Net.id() ? ' mine' : '');
+    var name = D.createElement('b');
+    name.textContent = m.from || '玩家';
+    var body = D.createElement('span');
+    body.textContent = String(m.m || '');
+    item.appendChild(name);
+    item.appendChild(body);
+    host.appendChild(item);
+    while (host.children.length > 30) host.removeChild(host.firstChild);
+    host.scrollTop = host.scrollHeight;
   }
 
   function submitChat(inputId) {

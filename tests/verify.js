@@ -130,6 +130,7 @@ assert.ok((html.match(/sound-toggle/g) || []).length >= 4, '音樂與音效按�
 assert.ok(html.includes('id="ropt-first"') && html.includes('data-v="host"') && html.includes('data-v="guest"'), '房間設定必須提供先手玩家選項');
 assert.ok(appSource.includes('readInviteRoom') && appSource.includes('w.Net.join(inviteRoomId)'), '邀請連結開啟頁面後必須自動嘗試加入房間');
 assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
+assert.ok(appSource.includes("var targetId = cur === 's-game' ? 'game-chatlog' : 'room-chatlog'") && appSource.includes('var host = q(targetId)'), '房間與對戰聊天室訊息不得互相混入');
 assert.ok(appSource.includes("markRow(q('ropt-first')") && appSource.includes("w.Net.setopt(room.size, room.deck, b.getAttribute('data-v'))"), '房主先手選項必須同步到伺服器');
 assert.ok(appSource.includes('對手離開了遊戲，對戰即將結束') && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
 assert.ok(appSource.includes("classList.toggle('chat-open')") && appSource.includes("setAttribute('aria-expanded'"), '聊天室必須點擊後才展開並同步可及性狀態');
