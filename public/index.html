@@ -84,6 +84,12 @@
         <h2 id="room-title">房間</h2>
         <span class="spacer"></span>
       </div>
+      <div class="invitebar" id="invitebar">
+        <label for="invite-url">邀請連結</label>
+        <input id="invite-url" readonly aria-label="房間邀請連結">
+        <button class="btn3d small" data-color="mint" id="b-copyinvite">複製</button>
+        <button class="btn3d small" data-color="sky" id="b-shareinvite">分享</button>
+      </div>
       <div class="seats">
         <div class="seat" id="seat0"><div class="ava">🐻</div><b>等待中…</b><span class="rdy">—</span></div>
         <div class="vs">VS</div>
@@ -103,6 +109,14 @@
         <button class="btn3d big" data-color="pink" id="b-ready">我準備好了 ✔</button>
       </div>
       <div class="sysline" id="sysline"></div>
+      <section class="chatbox room-chat" aria-label="房間聊天室">
+        <div class="chat-head"><b>房間聊天室</b><span>最多 60 字</span></div>
+        <div class="chatlog" id="room-chatlog" aria-live="polite"></div>
+        <form class="chatform" id="room-chatform">
+          <input id="room-chatinput" maxlength="60" autocomplete="off" placeholder="說點什麼…" aria-label="輸入聊天室訊息">
+          <button class="btn3d small" data-color="mint" type="submit">送出</button>
+        </form>
+      </section>
     </div>
   </section>
 
@@ -121,7 +135,24 @@
 
     <div class="timerbar"><div class="fill" id="timer-fill"></div><span class="num" id="timer-num">10</span></div>
 
-    <div class="boardwrap"><div class="board" id="board"></div></div>
+    <div class="gamebody">
+      <div class="boardwrap"><div class="board" id="board"></div></div>
+      <aside class="online-tools" id="online-tools" aria-label="即時對戰資訊">
+        <section class="summary-card">
+          <div class="summary-head"><b>即時戰況</b><span id="summary-progress">配對 0／0</span></div>
+          <div class="summary-players" id="summary-players"></div>
+          <div class="summary-feed" id="summary-feed" aria-live="polite"></div>
+        </section>
+        <section class="chatbox game-chat" aria-label="對戰聊天室">
+          <div class="chat-head"><b>對戰聊天室</b><span>即時</span></div>
+          <div class="chatlog" id="game-chatlog" aria-live="polite"></div>
+          <form class="chatform" id="game-chatform">
+            <input id="game-chatinput" maxlength="60" autocomplete="off" placeholder="送出訊息…" aria-label="輸入聊天室訊息">
+            <button class="btn3d small" data-color="mint" type="submit">送出</button>
+          </form>
+        </section>
+      </aside>
+    </div>
 
     <footer class="gfoot">
       <button class="btn3d" data-color="lemon" id="b-hint">💡 提示 <span id="hint-left">1</span></button>

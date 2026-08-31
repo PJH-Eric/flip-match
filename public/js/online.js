@@ -72,6 +72,7 @@
     setopt: function (size, deck) { send({ t: 'setopt', size: size, deck: deck }); },
     ready: function (v) { send({ t: 'ready', v: v }); },
     flip: function (i) { send({ t: 'flip', i: i }); },
-    hint: function () { send({ t: 'hint' }); }
+    hint: function () { send({ t: 'hint' }); },
+    chat: function (message) { send({ t: 'chat', m: String(message || '').slice(0, 60) }); }
   };
 })(window);

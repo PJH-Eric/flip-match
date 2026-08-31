@@ -335,6 +335,7 @@ function handleClient(conn) {
       case 'hello':
         cl.name = String(m.name || '玩家').slice(0, 12) || '玩家';
         conn.sendJSON({ t: 'welcome', id: cl.id, name: cl.name });
+        if (cl.room) sendRoom(cl.room);
         broadcastRooms();
         break;
       case 'rooms': {
@@ -395,7 +396,9 @@ function handleClient(conn) {
       case 'chat': {
         const r = cl.room;
         if (!r) return;
-        bcast(r, { t: 'chat', from: cl.name, m: String(m.m || '').slice(0, 60) });
+        const message = String(m.m || '').trim().slice(0, 60);
+        if (!message) return;
+        bcast(r, { t: 'chat', fromId: cl.id, from: cl.name, m: message, ts: Date.now() });
         break;
       }
       case 'leave': leaveRoom(cl); break;

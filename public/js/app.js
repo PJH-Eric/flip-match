@@ -20,6 +20,67 @@
   var pendingMode = 'solo';
   var room = null;
   var lastCfg = null;
+  var inviteRoomId = readInviteRoom();
+  var inviteAttempted = false;
+
+  function readInviteRoom() {
+    var source = (location.search || '') + '&' + (location.hash || '');
+    var found = source.match(/[?&#]room=([^&#]+)/i);
+    if (!found) return '';
+    try { return decodeURIComponent(found[1]).slice(0, 32); } catch (e) { return ''; }
+  }
+
+  function inviteUrl(roomId) {
+    var base = location.href.split(/[?#]/)[0];
+    return base + '?room=' + encodeURIComponent(roomId);
+  }
+
+  function clearChatLogs() {
+    ['room-chatlog', 'game-chatlog'].forEach(function (id) { var host = q(id); if (host) host.innerHTML = ''; });
+  }
+
+  function appendChat(m) {
+    ['room-chatlog', 'game-chatlog'].forEach(function (id) {
+      var host = q(id);
+      if (!host) return;
+      var item = D.createElement('div');
+      item.className = 'chatmsg' + (m.fromId && m.fromId === w.Net.id() ? ' mine' : '');
+      var name = D.createElement('b');
+      name.textContent = m.from || '玩家';
+      var body = D.createElement('span');
+      body.textContent = String(m.m || '');
+      item.appendChild(name);
+      item.appendChild(body);
+      host.appendChild(item);
+      while (host.children.length > 30) host.removeChild(host.firstChild);
+      host.scrollTop = host.scrollHeight;
+    });
+  }
+
+  function submitChat(inputId) {
+    var input = q(inputId);
+    if (!input) return;
+    var message = input.value.trim();
+    if (!message) return;
+    w.Net.chat(message);
+    input.value = '';
+  }
+
+  function showRoomNotice(message) {
+    var target = q('sysline');
+    if (target) target.textContent = message;
+  }
+
+  function openOnline() {
+    w.Sound.play('click');
+    var n = w.Net.savedName();
+    if (n) q('nickname').value = n;
+    q('lobby-note').textContent = inviteRoomId
+      ? '正在透過邀請連結加入房間…'
+      : '同一個 Wi-Fi 底下，另一台平板打開伺服器顯示的網址就能一起玩。';
+    go('s-lobby');
+    w.Net.connect();
+  }
 
   /* ---------- 畫面切換 ---------- */
   function go(id) {
@@ -167,6 +228,7 @@
   function renderRoom() {
     if (!room) return;
     q('room-title').textContent = room.name;
+    q('invite-url').value = inviteUrl(room.id);
     var isHost = room.hostId === w.Net.id();
     q('host-opts').style.display = isHost ? '' : 'none';
     markRow(q('ropt-size'), room.size);
@@ -257,15 +319,29 @@
     });
     syncSoundBtns();
 
-    q('b-online').onclick = function () {
-      w.Sound.play('click');
-      var n = w.Net.savedName();
-      if (n) q('nickname').value = n;
-      go('s-lobby');
-      w.Net.connect();
-    };
+    q('b-online').onclick = openOnline;
     q('b-refresh').onclick = function () { w.Sound.play('click'); w.Net.rooms(); };
     q('nickname').onchange = function () { w.Net.setName(q('nickname').value); };
+    q('b-copyinvite').onclick = function () {
+      var input = q('invite-url');
+      if (!input.value) return;
+      input.focus();
+      input.select();
+      var done = function () { showRoomNotice('邀請連結已複製，可以傳給對手！'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(input.value).then(done, function () { document.execCommand('copy'); done(); });
+      else { document.execCommand('copy'); done(); }
+    };
+    q('b-shareinvite').onclick = function () {
+      var link = q('invite-url').value;
+      if (!link) return;
+      if (navigator.share) {
+        navigator.share({ title: '翻牌配對碰房間邀請', text: '一起來玩翻牌配對碰！', url: link }).catch(function () {});
+      } else {
+        q('b-copyinvite').click();
+      }
+    };
+    q('room-chatform').addEventListener('submit', function (e) { e.preventDefault(); submitChat('room-chatinput'); });
+    q('game-chatform').addEventListener('submit', function (e) { e.preventDefault(); submitChat('game-chatinput'); });
     q('b-create').onclick = function () {
       w.Sound.play('click');
       if (!w.Net.isOpen()) { w.Game.toast('尚未連上伺服器'); return; }
@@ -285,9 +361,13 @@
       var d = q('conn-dot');
       d.className = 'conn' + (s === 'ok' ? ' ok' : s === 'bad' ? ' bad' : '');
       q('conn-txt').textContent = s === 'ok' ? '已連線' : s === 'bad' ? '連線中斷' : '連線中…';
+      if (s === 'ok' && inviteRoomId && !inviteAttempted) {
+        inviteAttempted = true;
+        setTimeout(function () { w.Net.join(inviteRoomId); }, 120);
+      }
     });
     w.Net.on('rooms', function (m) { if (cur === 's-lobby') renderRooms(m.rooms); });
-    w.Net.on('joined', function () { q('sysline').textContent = ''; go('s-room'); });
+    w.Net.on('joined', function () { inviteAttempted = true; clearChatLogs(); q('sysline').textContent = ''; go('s-room'); });
     w.Net.on('room', function (m) {
       room = m.room;
       if (cur === 's-room') renderRoom();
@@ -295,8 +375,13 @@
     });
     w.Net.on('left', function () { room = null; go('s-lobby'); w.Net.rooms(); });
     w.Net.on('sys', function (m) { q('sysline').textContent = m.m; });
-    w.Net.on('err', function (m) { w.Game.toast(m.m); q('sysline').textContent = m.m; });
-    w.Net.on('chat', function (m) { q('sysline').textContent = m.from + '：' + m.m; });
+    w.Net.on('err', function (m) {
+      var inviteError = !!inviteRoomId;
+      if (inviteError) { inviteRoomId = ''; q('lobby-note').textContent = '邀請連結無法加入，請從大廳選擇房間。'; }
+      showRoomNotice(m.m);
+      if (!inviteError) q('lobby-note').textContent = m.m;
+    });
+    w.Net.on('chat', appendChat);
 
     w.Net.on('start', function (m) {
       var players = m.players.map(function (p, i) {
@@ -314,7 +399,7 @@
       });
     });
     w.Net.on('turn', function (m) { w.Game.net.turn(m.cur); });
-    w.Net.on('flip', function (m) { w.Game.net.flip(m.i, m.sym); });
+    w.Net.on('flip', function (m) { w.Game.net.flip(m.i, m.sym, m.by); });
     w.Net.on('result', function (m) { w.Game.net.result(m.a, m.b, m.match, m.scores, m.by); });
     w.Net.on('timeout', function (m) { w.Game.net.timeout(m.close); });
     w.Net.on('hintuse', function (m) { w.Game.net.hintUsed(m.by, m.left); });
@@ -326,7 +411,8 @@
       go('s-room');
     });
 
-    go('s-home');
+    if (inviteRoomId) openOnline();
+    else go('s-home');
   }
 
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', init);

@@ -118,6 +118,22 @@ body{
 .seat.ready .rdy{color:#3E9E62}
 .vs{font-weight:900;font-size:1.3rem;color:var(--pink-d)}
 .sysline{text-align:center;font-size:.84rem;color:var(--ink-soft);min-height:1.4em;margin-top:10px}
+.invitebar{display:flex;align-items:center;gap:8px;background:#F4FBFF;border:3px dashed var(--sky-d);border-radius:16px;padding:8px 10px;margin:8px 0 12px}
+.invitebar label{font-weight:800;white-space:nowrap;font-size:.88rem}
+.invitebar input{min-width:0;flex:1;border:2px solid var(--ink-soft);border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink);font:inherit;font-size:.8rem;user-select:text;-webkit-user-select:text}
+.invitebar .btn3d{min-height:40px;padding:7px 12px calc(7px + var(--d));font-size:.82rem}
+.chatbox{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:10px;box-shadow:0 4px 0 rgba(91,70,54,.12);user-select:text;-webkit-user-select:text}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 7px;font-size:.9rem}
+.chat-head span{font-size:.72rem;color:var(--ink-soft);font-weight:700}
+.chatlog{display:flex;flex-direction:column;gap:5px;overflow-y:auto;min-height:0;max-height:150px;padding:2px 3px}
+.chatmsg{align-self:flex-start;max-width:92%;background:#F7F0E8;border-radius:11px;padding:5px 9px;font-size:.82rem;line-height:1.3;overflow-wrap:anywhere}
+.chatmsg.mine{align-self:flex-end;background:#E6F8F0}
+.chatmsg b{font-size:.74rem;margin-right:4px}
+.chatform{display:flex;gap:6px;margin-top:7px}
+.chatform input{min-width:0;flex:1;border:2px solid var(--ink-soft);border-radius:10px;padding:7px 9px;background:#fff;color:var(--ink);font:inherit;font-size:.82rem;user-select:text;-webkit-user-select:text;outline:none}
+.chatform input:focus,.invitebar input:focus{border-color:var(--sky-d);box-shadow:0 0 0 2px rgba(125,182,216,.22)}
+.chatform .btn3d{min-height:40px;padding:7px 11px calc(7px + var(--d));font-size:.8rem}
+.room-chat{margin-top:14px}
 
 /* ---------- 遊戲畫面 ---------- */
 #s-game{display:none}
@@ -142,9 +158,27 @@ body{
 @keyframes pulsebar{50%{opacity:.6}}
 .timerbar .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:900;letter-spacing:.06em}
 
+.gamebody{display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px}
 .boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:2px 8px}
 .board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bs);
   grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--cols),1fr)}
+.online-tools{display:none;flex:0 0 270px;min-height:0;flex-direction:column;gap:10px;overflow:hidden;padding:2px 4px 0 0}
+#s-game.online-mode .online-tools{display:flex}
+.summary-card{display:flex;flex-direction:column;min-height:0;background:#FFFDF8;border:3px solid var(--ink);border-radius:18px;padding:10px;box-shadow:0 4px 0 rgba(91,70,54,.12)}
+.summary-head{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px dashed #E9DDCF;padding:0 2px 7px;font-size:.9rem}
+.summary-head span{font-size:.74rem;color:var(--ink-soft);font-weight:800;white-space:nowrap}
+.summary-players{display:flex;flex-direction:column;gap:5px;padding:8px 0}
+.summary-player{display:flex;align-items:center;gap:7px;border-radius:10px;padding:5px 7px;background:#fff;font-size:.8rem}
+.summary-player.turn{background:var(--lemon);box-shadow:0 2px 0 var(--lemon-d)}
+.summary-player.me{border:2px solid var(--mint-d);padding:3px 5px}
+.summary-player .sp-avatar{font-size:1.15rem;line-height:1}
+.summary-player .sp-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.summary-player .sp-turn{font-size:.7rem;color:var(--ink-soft);font-weight:800;white-space:nowrap}
+.summary-player .sp-score{font-size:1.1rem;font-weight:900;color:var(--pink-d);min-width:1.1em;text-align:center}
+.summary-feed{display:flex;flex-direction:column;gap:4px;overflow-y:auto;min-height:52px;font-size:.76rem;color:var(--ink-soft);border-top:2px dashed #E9DDCF;padding-top:7px}
+.summary-feed p{margin:0;padding:4px 6px;background:#fff;border-radius:8px;overflow-wrap:anywhere}
+.game-chat{display:flex;flex:1;min-height:150px;flex-direction:column}
+.game-chat .chatlog{flex:1;max-height:none}
 
 .card{position:relative;perspective:800px;cursor:pointer}
 .card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .36s cubic-bezier(.4,1.4,.5,1)}
@@ -228,12 +262,22 @@ body{
   .optcard{flex:1 1 100px;min-width:96px;padding:10px 6px}
   .optcard .t{display:none}
   .logo{max-width:340px}
+  .online-tools{flex-basis:230px}
+  .gamebody{gap:6px;padding-left:6px;padding-right:6px}
 }
 @media (max-width:560px){
   .seats{gap:8px}
   .seat{padding:10px}
   .nick input{width:120px}
   .gmeta{font-size:.8rem}
+  .invitebar{flex-wrap:wrap}
+  .invitebar label{width:100%}
+  .invitebar input{flex-basis:calc(100% - 100px)}
+  #s-game.online-mode .gamebody{flex-direction:column}
+  #s-game.online-mode .online-tools{display:grid;grid-template-columns:1fr 1.2fr;flex:0 0 168px;width:100%;gap:6px;padding:0 2px 2px}
+  .summary-card,.game-chat{min-height:0}
+  .summary-feed{max-height:57px}
+  .game-chat{min-height:0}
 }
 @media (orientation:landscape) and (max-height:520px){
   .scorebar{padding:4px}

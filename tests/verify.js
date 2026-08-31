@@ -64,10 +64,20 @@ assert.ok(!html.includes('id="opt-ai"'), '設定畫面不應再顯示電腦強�
 const appSource = read(path.join(publicDir, 'js', 'app.js'));
 const joinHandler = appSource.slice(appSource.indexOf('host.onclick'), appSource.indexOf('function renderRoom()'));
 assert.ok(joinHandler.includes('w.Net.setName(nick);'), '加入房間前必須先同步暱稱');
+assert.ok(html.includes('id="invite-url"') && html.includes('id="b-copyinvite"'), '房間必須提供邀請連結與複製按鈕');
+assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享按鈕');
+assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
+assert.ok(html.includes('id="room-chatform"') && html.includes('id="game-chatform"'), '房間與對戰畫面都必須提供聊天室輸入');
+assert.ok(appSource.includes('readInviteRoom') && appSource.includes('w.Net.join(inviteRoomId)'), '邀請連結開啟頁面後必須自動嘗試加入房間');
+assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
+const onlineSource = read(path.join(publicDir, 'js', 'online.js'));
+assert.ok(onlineSource.includes('chat: function'), 'WebSocket 用戶端必須提供聊天室訊息方法');
 
 const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const styleSource = read(path.join(publicDir, 'css', 'style.css'));
-const onlineFlip = gameSource.slice(gameSource.indexOf('flip: function (i, sym)'), gameSource.indexOf('result: function (a, b'));
+assert.ok(gameSource.includes('renderOnlineSummary') && gameSource.includes('summaryEvent'), '線上對戰必須即時更新摘要與行動紀錄');
+assert.ok(gameSource.includes("classList.toggle('online-mode'"), '線上對戰必須顯示摘要與聊天室側欄');
+const onlineFlip = gameSource.slice(gameSource.indexOf('flip: function (i, sym'), gameSource.indexOf('result: function (a, b'));
 assert.ok(onlineFlip.includes('updateStat();'), '線上翻第一張牌後必須刷新提示按鈕狀態');
 
 const keptOpenMatches = gameSource.match(/classList\.add\('open', 'matched'\)/g) || [];
@@ -81,5 +91,6 @@ assert.ok(styleSource.includes('.card.matched .fc.front{z-index:2;transform:none
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 const serverSource = read(path.join(root, 'server.js'));
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
+assert.ok(serverSource.includes('fromId: cl.id') && serverSource.includes('Date.now()'), '伺服器聊天室訊息必須帶有發送者與時間');
 
 console.log('PASS：頁面資源、七套牌組、數字範圍與單機入口均正確');
