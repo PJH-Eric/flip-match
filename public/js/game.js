@@ -434,7 +434,10 @@
     stopTimer();
     if (memInt) { clearInterval(memInt); memInt = null; }
     if (el.overlay) el.overlay.classList.remove('on', 'peek');
-    if (q('s-game')) q('s-game').classList.remove('online-mode');
+    if (q('s-game')) q('s-game').classList.remove('online-mode', 'chat-open');
+    var chatToggle = q('b-gamechat'), chatbox = q('game-chatbox');
+    if (chatToggle) chatToggle.setAttribute('aria-expanded', 'false');
+    if (chatbox) chatbox.setAttribute('aria-hidden', 'true');
     if (S) S.phase = 'over';
     S = null;
   }

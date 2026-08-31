@@ -148,7 +148,7 @@
           <div class="summary-players" id="summary-players"></div>
           <div class="summary-feed" id="summary-feed" aria-live="polite"></div>
         </section>
-        <section class="chatbox game-chat" aria-label="對戰聊天室">
+        <section class="chatbox game-chat" id="game-chatbox" aria-label="對戰聊天室" aria-hidden="true">
           <div class="chat-head"><b>對戰聊天室</b><span>即時</span></div>
           <div class="chatlog" id="game-chatlog" aria-live="polite"></div>
           <form class="chatform" id="game-chatform">
@@ -160,7 +160,10 @@
     </div>
 
     <footer class="gfoot">
-      <button class="btn3d" data-color="lemon" id="b-hint">💡 提示 <span id="hint-left">1</span></button>
+      <div class="game-controls">
+        <button class="btn3d small chat-toggle" data-color="sky" id="b-gamechat" type="button" aria-expanded="false" aria-controls="game-chatbox">💬 聊天室</button>
+        <button class="btn3d" data-color="lemon" id="b-hint">💡 提示 <span id="hint-left">1</span></button>
+      </div>
       <div class="statline" id="statline"></div>
     </footer>
 

@@ -180,8 +180,12 @@ body{
 .summary-player .sp-score{font-size:1.1rem;font-weight:900;color:var(--pink-d);min-width:1.1em;text-align:center}
 .summary-feed{display:flex;flex-direction:column;gap:4px;overflow-y:auto;min-height:52px;font-size:.76rem;color:var(--ink-soft);border-top:2px dashed #E9DDCF;padding-top:7px}
 .summary-feed p{margin:0;padding:4px 6px;background:#fff;border-radius:8px;overflow-wrap:anywhere}
-.game-chat{position:absolute;left:10px;bottom:8px;width:clamp(220px,23vw,300px);height:clamp(180px,42%,280px);display:flex;flex:none;min-height:0;flex-direction:column}
+.game-chat{position:absolute;left:10px;bottom:8px;width:clamp(220px,23vw,300px);height:clamp(180px,42%,280px);display:none;flex:none;min-height:0;flex-direction:column}
+#s-game.online-mode.chat-open .game-chat{display:flex;bottom:8px}
 .game-chat .chatlog{flex:1;max-height:none}
+.chat-toggle{display:none}
+#s-game.online-mode .chat-toggle{display:inline-flex}
+#s-game.online-mode.chat-open .chat-toggle{background:var(--mint)}
 
 .card{position:relative;perspective:800px;cursor:pointer}
 .card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .36s cubic-bezier(.4,1.4,.5,1)}
@@ -218,6 +222,7 @@ body{
 .card.locked{cursor:default}
 
 .gfoot{display:flex;align-items:center;gap:12px;padding:6px 14px 12px}
+.game-controls{display:flex;align-items:center;gap:10px}
 .statline{flex:1;text-align:right;font-weight:800;color:var(--ink-soft);font-size:.9rem}
 
 .overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(91,70,54,.28);backdrop-filter:blur(2px);z-index:30}
@@ -282,6 +287,7 @@ body{
   .invitebar input{flex-basis:calc(100% - 100px)}
   #s-game.online-mode .gamebody{flex-direction:column;--online-side:0px}
   #s-game.online-mode .online-tools{position:static;display:grid;grid-template-columns:1fr 1.2fr;flex:0 0 168px;width:100%;height:auto;gap:6px;padding:0 2px 2px;pointer-events:auto;overflow:hidden}
+  #s-game.online-mode.chat-open .online-tools{flex-basis:250px}
   .summary-card,.game-chat{position:static;width:auto;height:auto;min-height:0}
   .summary-feed{max-height:57px}
   .game-chat{min-height:0}

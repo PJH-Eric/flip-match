@@ -312,6 +312,13 @@
       if (room) { w.Net.leave(); room = null; }
       go('s-home');
     };
+    q('b-gamechat').onclick = function () {
+      if (cur !== 's-game' || !q('s-game').classList.contains('online-mode')) return;
+      w.Sound.play('click');
+      var open = q('s-game').classList.toggle('chat-open');
+      this.setAttribute('aria-expanded', open ? 'true' : 'false');
+      q('game-chatbox').setAttribute('aria-hidden', open ? 'false' : 'true');
+    };
     [['b-music', 'b-music2'], ['b-sfx', 'b-sfx2']].forEach(function (pair, k) {
       pair.forEach(function (id) {
         var b = q(id); if (!b) return;

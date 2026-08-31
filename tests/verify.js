@@ -125,11 +125,13 @@ assert.ok(html.includes('id="invite-url"') && html.includes('id="b-copyinvite"')
 assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享按鈕');
 assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
 assert.ok(html.includes('id="room-chatform"') && html.includes('id="game-chatform"'), '房間與對戰畫面都必須提供聊天室輸入');
+assert.ok(html.includes('id="b-gamechat"') && html.includes('aria-controls="game-chatbox"'), '對戰聊天室必須提供可展開的控制按鈕');
 assert.ok(html.includes('id="ropt-first"') && html.includes('data-v="host"') && html.includes('data-v="guest"'), '房間設定必須提供先手玩家選項');
 assert.ok(appSource.includes('readInviteRoom') && appSource.includes('w.Net.join(inviteRoomId)'), '邀請連結開啟頁面後必須自動嘗試加入房間');
 assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
 assert.ok(appSource.includes("markRow(q('ropt-first')") && appSource.includes("w.Net.setopt(room.size, room.deck, b.getAttribute('data-v'))"), '房主先手選項必須同步到伺服器');
 assert.ok(appSource.includes('對手離開了遊戲，對戰即將結束') && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
+assert.ok(appSource.includes("classList.toggle('chat-open')") && appSource.includes("setAttribute('aria-expanded'"), '聊天室必須點擊後才展開並同步可及性狀態');
 const onlineSource = read(path.join(publicDir, 'js', 'online.js'));
 assert.ok(onlineSource.includes('chat: function'), 'WebSocket 用戶端必須提供聊天室訊息方法');
 assert.ok(onlineSource.includes('setopt: function (size, deck, first)'), 'WebSocket 用戶端必須傳送先手設定');
@@ -153,7 +155,8 @@ assert.ok(styleSource.includes('.card.matched .fc.back{visibility:hidden}'), '�
 assert.ok(styleSource.includes('.card.matched .fc.front{z-index:2;transform:none}'), '已配對牌必須固定顯示正面');
 assert.ok(styleSource.includes('.online-tools{display:none;position:absolute;inset:0;'), '線上資訊區必須改為浮動版面以放大棋盤');
 assert.ok(styleSource.includes('.summary-card{position:absolute;top:8px;right:10px;'), '即時戰況必須固定在右上角');
-assert.ok(styleSource.includes('.game-chat{position:absolute;left:10px;bottom:8px;'), '對戰聊天室必須固定在左下角');
+assert.ok(styleSource.includes('.game-chat{position:absolute;left:10px;bottom:8px;') && styleSource.includes('#s-game.online-mode.chat-open .game-chat{display:flex;'), '對戰聊天室必須預設隱藏並在左下角展開');
+assert.ok(styleSource.includes('.chat-toggle{display:none}') && styleSource.includes('#s-game.online-mode .chat-toggle{display:inline-flex}'), '聊天室按鈕只應在對戰中顯示');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
