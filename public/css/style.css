@@ -49,6 +49,8 @@ body{
 .btn3d.icononly{padding:10px 12px calc(10px + var(--d));min-width:52px;font-size:1.2rem;--d:6px}
 .btn3d .ico{font-size:1.2em}
 .btn3d.off .b3-lbl{opacity:.4}
+.sound-toggle::after{content:"✓";position:absolute;top:-5px;right:-5px;z-index:4;width:19px;height:19px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;border-radius:50%;background:#36B96B;color:#fff;font-size:.7rem;font-weight:1000;line-height:1;box-shadow:0 2px 0 #248A4D;pointer-events:none}
+.sound-toggle.off::after{content:"✕";background:#E66B7D;box-shadow:0 2px 0 #B44D60}
 
 /* ---------- 主選單 ---------- */
 #s-home{display:none}

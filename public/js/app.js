@@ -257,8 +257,21 @@
   }
 
   function syncSoundBtns() {
-    [q('b-music'), q('b-music2')].forEach(function (b) { if (b) b.classList.toggle('off', !w.Sound.isMusicOn()); });
-    [q('b-sfx'), q('b-sfx2')].forEach(function (b) { if (b) b.classList.toggle('off', !w.Sound.isSfxOn()); });
+    var musicOn = w.Sound.isMusicOn(), sfxOn = w.Sound.isSfxOn();
+    [q('b-music'), q('b-music2')].forEach(function (b) {
+      if (!b) return;
+      b.classList.toggle('off', !musicOn);
+      b.setAttribute('aria-pressed', musicOn ? 'true' : 'false');
+      b.setAttribute('aria-label', '背景音樂：' + (musicOn ? '開啟' : '關閉'));
+      b.title = '背景音樂：' + (musicOn ? '開啟' : '關閉');
+    });
+    [q('b-sfx'), q('b-sfx2')].forEach(function (b) {
+      if (!b) return;
+      b.classList.toggle('off', !sfxOn);
+      b.setAttribute('aria-pressed', sfxOn ? 'true' : 'false');
+      b.setAttribute('aria-label', '音效：' + (sfxOn ? '開啟' : '關閉'));
+      b.title = '音效：' + (sfxOn ? '開啟' : '關閉');
+    });
   }
 
   /* ---------- 初始化 ---------- */
