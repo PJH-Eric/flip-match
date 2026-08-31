@@ -230,7 +230,7 @@
       if (allMatched()) { endGame(); return; }
       if (!match && S.players.length > 1) nextPlayer();
       beginTurn();
-    }, match ? 620 : 1050);
+    }, match ? 620 : 480);
   }
 
   function applyResult(a, b, match, byId) {
@@ -246,7 +246,7 @@
       (function (x, y) {
         setTimeout(function () {
           x.classList.remove('open', 'wrong'); y.classList.remove('open', 'wrong');
-        }, 260);
+        }, 220);
       })(S.cards[a], S.cards[b]);
       if (S.ai) S.ai.decay();
     }
@@ -405,7 +405,7 @@
       } else {
         S.cards[a].classList.add('wrong'); S.cards[b].classList.add('wrong');
         w.Sound.play('wrong');
-        (function (x, y) { setTimeout(function () { x.classList.remove('open', 'wrong'); y.classList.remove('open', 'wrong'); }, 280); })(S.cards[a], S.cards[b]);
+        (function (x, y) { setTimeout(function () { x.classList.remove('open', 'wrong'); y.classList.remove('open', 'wrong'); }, 220); })(S.cards[a], S.cards[b]);
       }
       S.open = [];
       renderScores(); updateStat();

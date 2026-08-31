@@ -274,7 +274,7 @@ function onFlip(cl, i) {
     r.busy = false;
     bcast(r, { t: 'result', a: a, b: b, match: isMatch, scores: r.scores, by: cl.id });
     if (!checkEnd(r)) beginTurn(r);
-  }, isMatch ? 650 : 1100);
+  }, isMatch ? 650 : 500);
 }
 
 function onHint(cl) {

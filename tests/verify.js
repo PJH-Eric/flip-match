@@ -62,4 +62,8 @@ assert.ok(onlineFlip.includes('updateStat();'), '線上翻第一張牌後必須�
 const keptOpenMatches = gameSource.match(/classList\.add\('open', 'matched'\)/g) || [];
 assert.strictEqual(keptOpenMatches.length, 4, '單機與線上成功配對後兩張牌都必須保持翻開');
 
+assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
+const serverSource = read(path.join(root, 'server.js'));
+assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
+
 console.log('PASS：頁面資源、七套牌組、數字範圍與單機入口均正確');

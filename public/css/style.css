@@ -164,7 +164,7 @@ body{
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1)}}
 .card.hint .fc{animation:hintglow .6s ease-in-out 3}
 @keyframes hintglow{50%{box-shadow:0 0 0 6px var(--lemon),0 4px 0 rgba(91,70,54,.22)}}
-.card.wrong{animation:shake .38s ease}
+.card.wrong{animation:shake .24s ease}
 @keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
 .card.locked{cursor:default}
 
