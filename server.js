@@ -160,14 +160,20 @@ function roomBrief(r) {
 }
 function roomFull(r) {
   return {
-    id: r.id, name: r.name, size: r.size, deck: r.deck, state: r.state,
+    id: r.id, name: r.name, size: r.size, deck: r.deck, first: r.first, state: r.state,
     hostId: r.players[0] ? r.players[0].id : null,
     players: r.players.map(p => ({ id: p.id, name: p.name, ready: !!p.ready }))
   };
 }
+function pruneEmptyRooms() {
+  for (const r of rooms.values()) {
+    if (r.players.length === 0) { clearTimers(r); rooms.delete(r.id); }
+  }
+}
 function broadcastRooms() {
   const list = [];
-  for (const r of rooms.values()) if (r.state !== 'dead') list.push(roomBrief(r));
+  pruneEmptyRooms();
+  for (const r of rooms.values()) if (r.state !== 'dead' && r.players.length > 0) list.push(roomBrief(r));
   list.sort((a, b) => (a.state === 'wait' ? -1 : 1) - (b.state === 'wait' ? -1 : 1));
   const msg = JSON.stringify({ t: 'rooms', rooms: list });
   for (const c of clients.values()) if (!c.room) c.conn.sendText(msg);
@@ -203,7 +209,7 @@ function startGame(r) {
   r.scores = { };
   r.hintsLeft = {};
   r.players.forEach(p => { r.scores[p.id] = 0; r.hintsLeft[p.id] = rule.hints; });
-  r.cur = Math.floor(Math.random() * r.players.length);
+  r.cur = r.first === 'guest' && r.players.length > 1 ? 1 : 0;
   r.busy = true;
   bcast(r, {
     t: 'start', layout: cells, size: r.size, deck: r.deck,
@@ -314,6 +320,7 @@ function leaveRoom(cl, silent) {
       bcast(r, { t: 'oppLeft', name: cl.name });
       r.players.forEach(p => { p.ready = false; });
     } else {
+      if (idx === 0) r.first = 'host';
       bcast(r, { t: 'sys', m: cl.name + ' 離開了房間' });
     }
     sendRoom(r);
@@ -339,8 +346,9 @@ function handleClient(conn) {
         broadcastRooms();
         break;
       case 'rooms': {
+        pruneEmptyRooms();
         const list = [];
-        for (const r of rooms.values()) list.push(roomBrief(r));
+        for (const r of rooms.values()) if (r.state !== 'dead' && r.players.length > 0) list.push(roomBrief(r));
         conn.sendJSON({ t: 'rooms', rooms: list });
         break;
       }
@@ -350,7 +358,7 @@ function handleClient(conn) {
         const deck = DECK_IDS.indexOf(m.deck) >= 0 ? m.deck : 'animals';
         const r = {
           id: uid('r'), name: String(m.roomName || (cl.name + ' 的房間')).slice(0, 16),
-          size: size, deck: deck, players: [cl], state: 'wait',
+          size: size, deck: deck, first: m.first === 'guest' ? 'guest' : 'host', players: [cl], state: 'wait',
           layout: [], matched: [], open: [], scores: {}, hintsLeft: {}, cur: 0, busy: false,
           turnTimer: null, memTimer: null, flipTimer: null
         };
@@ -379,6 +387,7 @@ function handleClient(conn) {
         if (!r || r.players[0] !== cl || r.state === 'play') return;
         if ([4, 6, 8].indexOf(+m.size) >= 0) r.size = +m.size;
         if (DECK_IDS.indexOf(m.deck) >= 0) r.deck = m.deck;
+        if (m.first === 'host' || m.first === 'guest') r.first = m.first;
         r.players.forEach(p => { p.ready = false; });
         sendRoom(r); broadcastRooms();
         break;

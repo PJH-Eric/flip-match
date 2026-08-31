@@ -233,6 +233,7 @@
     q('host-opts').style.display = isHost ? '' : 'none';
     markRow(q('ropt-size'), room.size);
     markRow(q('ropt-deck'), room.deck);
+    markRow(q('ropt-first'), room.first || 'host');
     for (var i = 0; i < 2; i++) {
       var p = room.players[i], seat = q('seat' + i);
       if (p) {
@@ -266,7 +267,7 @@
     q('logo').innerHTML = w.UI.logo();
     w.UI.decorateAll();
     buildDeckRow(q('opt-deck'), function (v) { opt.deck = v; saveOpt(); markRow(q('opt-deck'), v); });
-    buildDeckRow(q('ropt-deck'), function (v) { if (room && room.hostId === w.Net.id()) w.Net.setopt(room.size, v); });
+    buildDeckRow(q('ropt-deck'), function (v) { if (room && room.hostId === w.Net.id()) w.Net.setopt(room.size, v, room.first); });
     markRow(q('opt-size'), opt.size);
     markRow(q('opt-deck'), opt.deck);
 
@@ -286,7 +287,11 @@
     };
     q('ropt-size').onclick = function (e) {
       var b = e.target.closest('.optcard'); if (!b || !room || room.hostId !== w.Net.id()) return;
-      w.Sound.play('click'); w.Net.setopt(+b.getAttribute('data-v'), room.deck);
+      w.Sound.play('click'); w.Net.setopt(+b.getAttribute('data-v'), room.deck, room.first);
+    };
+    q('ropt-first').onclick = function (e) {
+      var b = e.target.closest('.optcard'); if (!b || !room || room.hostId !== w.Net.id()) return;
+      w.Sound.play('click'); w.Net.setopt(room.size, room.deck, b.getAttribute('data-v'));
     };
 
     q('b-solo').onclick = function () { w.Sound.play('click'); openSetup(); };
@@ -347,7 +352,7 @@
       if (!w.Net.isOpen()) { w.Game.toast('尚未連上伺服器'); return; }
       var nick = q('nickname').value || ('玩家' + Math.floor(Math.random() * 90 + 10));
       w.Net.setName(nick);
-      w.Net.create(nick + ' 的房間', opt.size, opt.deck);
+      w.Net.create(nick + ' 的房間', opt.size, opt.deck, 'host');
     };
     q('b-leaveroom').onclick = function () { w.Sound.play('click'); w.Net.leave(); room = null; go('s-lobby'); };
     q('b-ready').onclick = function () {
@@ -406,9 +411,13 @@
     w.Net.on('end', function (m) { w.Game.net.end(m.scores, m.winner); });
     w.Net.on('oppLeft', function (m) {
       w.Game.stop();
-      w.Game.toast('對手離開了遊戲', 2200);
-      q('sysline').textContent = (m.name || '對手') + ' 離開了，回到房間等待。';
-      go('s-room');
+      w.Game.toast('對手離開了遊戲，對戰即將結束', 1800);
+      setTimeout(function () {
+        if (cur !== 's-game') return;
+        go('s-room');
+        renderRoom();
+        q('sysline').textContent = (m.name || '對手') + ' 離開了，對戰已結束。';
+      }, 1800);
     });
 
     if (inviteRoomId) openOnline();
