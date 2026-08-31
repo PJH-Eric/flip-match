@@ -160,7 +160,17 @@ body{
 .card.open:active .in,.card.matched:active .in{transform:rotateY(180deg)}
 .card.matched{animation:pop .45s ease}
 .card.matched .fc{box-shadow:0 0 0 4px var(--mint),0 4px 0 rgba(91,70,54,.22)}
-.card.matched .in{opacity:.72}
+.card.matched .in,.card.matched:active .in{transform:none;opacity:.72}
+.card.matched .fc.back{visibility:hidden}
+.card.matched .fc.front{z-index:2;transform:none}
+.matchmark{position:absolute;z-index:4;top:-4px;right:-4px;display:none;width:58%;align-items:center;justify-content:flex-end;pointer-events:none}
+.card.matched .matchmark{display:flex}
+.matchcheck,.matchowner{display:flex;align-items:center;justify-content:center;width:44%;min-width:13px;max-width:25px;aspect-ratio:1;border-radius:50%;box-sizing:border-box}
+.matchcheck{background:#36B96B;border:2px solid #fff;color:#fff;font-size:clamp(.62rem,1.6vw,1rem);font-weight:1000;box-shadow:0 2px 0 #248A4D,0 0 0 2px #36B96B}
+.matchowner{display:none;margin-right:3px;background:#fff;border:3px solid var(--owner);font-size:clamp(.55rem,1.4vw,.9rem);box-shadow:0 2px 0 rgba(91,70,54,.22)}
+.matchmark.show-owner .matchowner{display:flex;order:-1}
+.matchmark.owner-0{--owner:#4D96FF}
+.matchmark.owner-1{--owner:#FF6B9D}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1)}}
 .card.hint .fc{animation:hintglow .6s ease-in-out 3}
 @keyframes hintglow{50%{box-shadow:0 0 0 6px var(--lemon),0 4px 0 rgba(91,70,54,.22)}}

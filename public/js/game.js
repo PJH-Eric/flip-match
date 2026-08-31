@@ -62,7 +62,7 @@
       html += '<div class="card" data-i="' + i + '"><div class="in">' +
         '<div class="fc back">' + w.UI.cardBack() + '</div>' +
         '<div class="fc front" style="--cardbg:' + (deck.bg || '#fff') + '"><svg viewBox="0 0 100 100">' + ic.svg + '</svg></div>' +
-        '</div></div>';
+        '</div><span class="matchmark"><span class="matchcheck">✓</span><span class="matchowner"></span></span></div>';
     }
     el.board.innerHTML = html;
     S.cards = el.board.querySelectorAll('.card');
@@ -80,6 +80,22 @@
     el.scorebar.innerHTML = h;
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function markMatched(index, byId) {
+    var card = S.cards[index], player = null, playerIndex = -1;
+    for (var i = 0; i < S.players.length; i++) {
+      if (S.players[i].id === byId) { player = S.players[i]; playerIndex = i; break; }
+    }
+    var mark = card.querySelector('.matchmark');
+    mark.className = 'matchmark';
+    mark.querySelector('.matchowner').textContent = '';
+    mark.title = '配對成功';
+    if (S.players.length > 1 && player) {
+      mark.classList.add('show-owner', 'owner-' + (playerIndex % 2));
+      mark.querySelector('.matchowner').textContent = player.avatar;
+      mark.title = player.name + ' 配對成功';
+    }
+  }
 
   function updateStat() {
     if (S.mode === 'solo') {
@@ -237,6 +253,7 @@
     if (match) {
       S.matched[a] = true; S.matched[b] = true; S.matchedCount += 2;
       S.cards[a].classList.add('open', 'matched'); S.cards[b].classList.add('open', 'matched');
+      markMatched(a, byId); markMatched(b, byId);
       S.scores[byId] = (S.scores[byId] || 0) + 1;
       if (S.ai) S.ai.remove(a, b);
       w.Sound.play('match');
@@ -401,6 +418,7 @@
       if (match) {
         S.matched[a] = true; S.matched[b] = true; S.matchedCount += 2;
         S.cards[a].classList.add('open', 'matched'); S.cards[b].classList.add('open', 'matched');
+        markMatched(a, byId); markMatched(b, byId);
         w.Sound.play('match');
       } else {
         S.cards[a].classList.add('wrong'); S.cards[b].classList.add('wrong');

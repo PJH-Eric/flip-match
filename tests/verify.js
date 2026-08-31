@@ -56,11 +56,17 @@ const joinHandler = appSource.slice(appSource.indexOf('host.onclick'), appSource
 assert.ok(joinHandler.includes('w.Net.setName(nick);'), '加入房間前必須先同步暱稱');
 
 const gameSource = read(path.join(publicDir, 'js', 'game.js'));
+const styleSource = read(path.join(publicDir, 'css', 'style.css'));
 const onlineFlip = gameSource.slice(gameSource.indexOf('flip: function (i, sym)'), gameSource.indexOf('result: function (a, b'));
 assert.ok(onlineFlip.includes('updateStat();'), '線上翻第一張牌後必須刷新提示按鈕狀態');
 
 const keptOpenMatches = gameSource.match(/classList\.add\('open', 'matched'\)/g) || [];
 assert.strictEqual(keptOpenMatches.length, 4, '單機與線上成功配對後兩張牌都必須保持翻開');
+assert.ok(gameSource.includes('class="matchmark"'), '每張牌必須包含右上角成功標記');
+const matchedOwnerMarks = gameSource.match(/markMatched\([ab], byId\)/g) || [];
+assert.strictEqual(matchedOwnerMarks.length, 4, '單機與線上配對成功時都必須標記兩張牌的玩家歸屬');
+assert.ok(styleSource.includes('.card.matched .fc.back{visibility:hidden}'), '已配對牌必須隱藏牌背');
+assert.ok(styleSource.includes('.card.matched .fc.front{z-index:2;transform:none}'), '已配對牌必須固定顯示正面');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 const serverSource = read(path.join(root, 'server.js'));
