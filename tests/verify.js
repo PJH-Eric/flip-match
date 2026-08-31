@@ -144,6 +144,7 @@ assert.ok(styleSource.includes('.card.matched .fc.back{visibility:hidden}'), '�
 assert.ok(styleSource.includes('.card.matched .fc.front{z-index:2;transform:none}'), '已配對牌必須固定顯示正面');
 assert.ok(styleSource.includes('.online-tools{display:none;flex:0 0 300px'), '線上遊戲側欄必須保留足夠寬度');
 assert.ok(styleSource.includes('.game-chat{display:flex;flex:1;min-height:220px'), '對戰聊天室必須保留足夠高度');
+assert.ok(styleSource.includes('#s-game.online-mode .boardwrap{transform:translateX(calc(var(--online-side) / 2))'), '線上棋盤必須補回側欄佔用的置中位移');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 const serverSource = read(path.join(root, 'server.js'));

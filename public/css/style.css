@@ -158,12 +158,14 @@ body{
 @keyframes pulsebar{50%{opacity:.6}}
 .timerbar .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:900;letter-spacing:.06em}
 
-.gamebody{display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px}
+.gamebody{display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px;--online-side:0px}
 .boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:2px 8px}
 .board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bs);
   grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--cols),1fr)}
 .online-tools{display:none;flex:0 0 300px;min-height:0;flex-direction:column;gap:10px;overflow:hidden;padding:2px 4px 0 0}
 #s-game.online-mode .online-tools{display:flex}
+#s-game.online-mode .gamebody{--online-side:300px}
+#s-game.online-mode .boardwrap{transform:translateX(calc(var(--online-side) / 2))}
 .summary-card{display:flex;flex-direction:column;min-height:0;background:#FFFDF8;border:3px solid var(--ink);border-radius:18px;padding:10px;box-shadow:0 4px 0 rgba(91,70,54,.12)}
 .summary-head{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:2px dashed #E9DDCF;padding:0 2px 7px;font-size:.9rem}
 .summary-head span{font-size:.74rem;color:var(--ink-soft);font-weight:800;white-space:nowrap}
@@ -269,6 +271,7 @@ body{
 }
 @media (min-width:821px) and (max-width:1100px){
   .online-tools{flex-basis:250px}
+  #s-game.online-mode .gamebody{--online-side:250px}
 }
 @media (max-width:560px){
   .seats{gap:8px}
@@ -278,7 +281,7 @@ body{
   .invitebar{flex-wrap:wrap}
   .invitebar label{width:100%}
   .invitebar input{flex-basis:calc(100% - 100px)}
-  #s-game.online-mode .gamebody{flex-direction:column}
+  #s-game.online-mode .gamebody{flex-direction:column;--online-side:0px}
   #s-game.online-mode .online-tools{display:grid;grid-template-columns:1fr 1.2fr;flex:0 0 168px;width:100%;gap:6px;padding:0 2px 2px}
   .summary-card,.game-chat{min-height:0}
   .summary-feed{max-height:57px}
