@@ -87,11 +87,20 @@ GitHub Pages 只能放靜態檔案，跑不了 WebSocket，所以 `server.js` �
 1. 登入 Render → **New → Blueprint** → 選這個 GitHub repository → **Apply**。
    （或用 **New → Web Service**，Build Command 留 `npm install`，Start Command 填 `node server.js`。）
 2. 建好之後會拿到一組網址，例如 `https://flip-match.onrender.com`。
-3. 把這組網址填回 `public/js/config.js` 的 `REMOTE`，然後 push：
-   ```js
-   var REMOTE = 'https://你的服務名稱.onrender.com';
-   ```
-4. push 到 `main` 後 GitHub Pages 會自動重新佈署，線上對戰就會連到 Render。
+3. 回到 GitHub repository → **Settings → Secrets and variables → Actions → Variables**
+   → **New repository variable**：
+
+   | Name | Value |
+   |------|-------|
+   | `SERVER_URL` | `https://你的服務名稱.onrender.com` |
+
+4. 到 **Actions** 分頁把 `Deploy to GitHub Pages` 重跑一次（**Re-run all jobs**），
+   線上對戰就會連到 Render。之後改網址只要改這個 variable 再重跑，不用改程式碼。
+
+> 網址是靠 `scripts/inject-server-url.js` 在佈署時寫進 `public/js/config.js` 的，
+> 版控裡的 `REMOTE` 永遠是空字串。
+> 想在本機試注入結果：`node scripts/inject-server-url.js https://xxx.onrender.com`
+> （記得試完用 `git checkout public/js/config.js` 還原）。
 
 ### 連線規則
 
