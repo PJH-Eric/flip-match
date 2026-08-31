@@ -28,7 +28,7 @@ sandbox.window = sandbox;
 sandbox.addEventListener = function () {};
 vm.createContext(sandbox);
 
-const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics'];
+const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics', 'sports'];
 const deckExpectedCounts = { phonetics: 37 };
 deckFiles.forEach((deck) => {
   vm.runInContext(read(path.join(publicDir, 'js', 'decks', `${deck}.js`)), sandbox, { filename: `${deck}.js` });
@@ -37,6 +37,8 @@ deckFiles.forEach((deck) => {
 });
 assert.strictEqual(new Set(sandbox.DECKS.flags.icons.map((icon) => icon.svg)).size, 32, '各國國旗牌組必須有 32 種不同旗幟');
 assert.strictEqual(new Set(sandbox.DECKS.flags.icons.map((icon) => icon.label)).size, 32, '各國國旗牌組的國家名稱不可重複');
+assert.strictEqual(new Set(sandbox.DECKS.sports.icons.map((icon) => icon.svg)).size, 32, '運動牌組必須有 32 種不同圖案');
+assert.strictEqual(new Set(sandbox.DECKS.sports.icons.map((icon) => icon.label)).size, 32, '運動牌組的運動名稱不可重複');
 
 const realisticSource = read(path.join(publicDir, 'js', 'decks', 'realistic.js'));
 vm.runInContext(realisticSource, sandbox, { filename: 'realistic.js' });
@@ -125,6 +127,9 @@ assert.ok(serverSource.includes("'flags'"), '伺服器必須允許各國國旗�
 assert.ok(scriptSources.includes('js/decks/phonetics.js'), '頁面必須載入注音符號牌組');
 assert.ok(appSource.includes("'phonetics'"), '前端牌組選單必須包含注音符號');
 assert.ok(serverSource.includes("'phonetics'"), '伺服器必須允許注音符號牌組');
+assert.ok(scriptSources.includes('js/decks/sports.js'), '頁面必須載入運動牌組');
+assert.ok(appSource.includes("'sports'"), '前端牌組選單必須包含運動');
+assert.ok(serverSource.includes("'sports'"), '伺服器必須允許運動牌組');
 assert.ok(html.includes('id="invite-url"') && html.includes('id="b-copyinvite"'), '房間必須提供邀請連結與複製按鈕');
 assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享按鈕');
 assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
@@ -178,4 +183,4 @@ assert.ok(serverSource.includes('function pruneEmptyRooms') && serverSource.incl
 assert.ok(serverSource.includes("r.cur = r.first === 'guest'"), '伺服器必須依房主設定決定先手');
 assert.ok(serverSource.includes("case 'start':") && serverSource.includes('r.players[0] !== cl') && serverSource.includes('r.players[1].ready'), '伺服器必須只允許房主在對手 ready 後開始遊戲');
 
-console.log('PASS：頁面資源、九套牌組、數字範圍與單機入口均正確');
+console.log('PASS：頁面資源、十套牌組、數字範圍與單機入口均正確');
