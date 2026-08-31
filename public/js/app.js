@@ -249,9 +249,17 @@
     }
     var mine = room.players.filter(function (p) { return p.id === w.Net.id(); })[0];
     var btn = q('b-ready');
-    w.UI.setLabel(btn, mine && mine.ready ? '取消準備 ✖' : '我準備好了 ✔');
-    w.UI.setColor(btn, mine && mine.ready ? 'cream' : 'pink');
-    btn.disabled = room.players.length < 2;
+    if (isHost) {
+      var opponentReady = room.players[1] && room.players[1].ready;
+      var canStart = room.players.length >= 2 && opponentReady;
+      w.UI.setLabel(btn, room.players.length < 2 ? '等待玩家加入…' : canStart ? '開始遊戲 ▶' : '等待對手準備…');
+      w.UI.setColor(btn, canStart ? 'pink' : 'cream');
+      btn.disabled = !canStart;
+    } else {
+      w.UI.setLabel(btn, mine && mine.ready ? '取消準備 ✖' : '我準備好了 ✔');
+      w.UI.setColor(btn, mine && mine.ready ? 'cream' : 'pink');
+      btn.disabled = room.players.length < 2;
+    }
     if (room.players.length < 2) q('sysline').textContent = '等待另一位玩家加入…';
   }
 
@@ -375,6 +383,11 @@
     };
     q('b-leaveroom').onclick = function () { w.Sound.play('click'); w.Net.leave(); room = null; go('s-lobby'); };
     q('b-ready').onclick = function () {
+      if (room && room.hostId === w.Net.id()) {
+        w.Sound.play('start');
+        w.Net.start();
+        return;
+      }
       w.Sound.play('ready');
       var mine = room && room.players.filter(function (p) { return p.id === w.Net.id(); })[0];
       w.Net.ready(!(mine && mine.ready));

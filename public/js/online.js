@@ -70,6 +70,7 @@
     join: function (id) { send({ t: 'join', id: id }); },
     leave: function () { send({ t: 'leave' }); },
     setopt: function (size, deck, first) { send({ t: 'setopt', size: size, deck: deck, first: first }); },
+    start: function () { send({ t: 'start' }); },
     ready: function (v) { send({ t: 'ready', v: v }); },
     flip: function (i) { send({ t: 'flip', i: i }); },
     hint: function () { send({ t: 'hint' }); },

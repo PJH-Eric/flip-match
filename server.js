@@ -396,10 +396,15 @@ function handleClient(conn) {
       }
       case 'ready': {
         const r = cl.room;
-        if (!r || r.state === 'play') return;
+        if (!r || r.state === 'play' || r.players[0] === cl) return;
         cl.ready = !!m.v;
         sendRoom(r);
-        if (r.players.length === 2 && r.players.every(p => p.ready)) startGame(r);
+        break;
+      }
+      case 'start': {
+        const r = cl.room;
+        if (!r || (r.state !== 'wait' && r.state !== 'over') || r.players[0] !== cl || r.players.length < 2 || !r.players[1].ready) return;
+        startGame(r);
         break;
       }
       case 'flip': onFlip(cl, +m.i); break;

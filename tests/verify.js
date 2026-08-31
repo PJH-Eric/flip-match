@@ -136,12 +136,14 @@ assert.ok(appSource.includes('readInviteRoom') && appSource.includes('w.Net.join
 assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
 assert.ok(appSource.includes("var targetId = cur === 's-game' ? 'game-chatlog' : 'room-chatlog'") && appSource.includes('var host = q(targetId)'), '房間與對戰聊天室訊息不得互相混入');
 assert.ok(appSource.includes("markRow(q('ropt-first')") && appSource.includes("w.Net.setopt(room.size, room.deck, b.getAttribute('data-v'))"), '房主先手選項必須同步到伺服器');
+assert.ok(appSource.includes('開始遊戲 ▶') && appSource.includes('w.Net.start()') && appSource.includes('opponentReady') && appSource.includes('等待對手準備…'), '房主必須在對手 ready 後顯示開始遊戲');
 assert.ok(appSource.includes('對手離開了遊戲，對戰即將結束') && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
 assert.ok(appSource.includes("classList.toggle('chat-open')") && appSource.includes("setAttribute('aria-expanded'"), '聊天室必須點擊後才展開並同步可及性狀態');
 assert.ok(appSource.includes("aria-pressed") && appSource.includes('背景音樂：') && appSource.includes('音效：'), '音樂與音效狀態必須同步更新可見與可及性提示');
 const onlineSource = read(path.join(publicDir, 'js', 'online.js'));
 assert.ok(onlineSource.includes('chat: function'), 'WebSocket 用戶端必須提供聊天室訊息方法');
 assert.ok(onlineSource.includes('setopt: function (size, deck, first)'), 'WebSocket 用戶端必須傳送先手設定');
+assert.ok(onlineSource.includes('start: function'), 'WebSocket 用戶端必須提供房主開始遊戲方法');
 
 const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const styleSource = read(path.join(publicDir, 'css', 'style.css'));
@@ -174,5 +176,6 @@ assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗
 assert.ok(serverSource.includes('fromId: cl.id') && serverSource.includes('Date.now()'), '伺服器聊天室訊息必須帶有發送者與時間');
 assert.ok(serverSource.includes('function pruneEmptyRooms') && serverSource.includes('r.players.length > 0'), '空房間不得出現在房間列表');
 assert.ok(serverSource.includes("r.cur = r.first === 'guest'"), '伺服器必須依房主設定決定先手');
+assert.ok(serverSource.includes("case 'start':") && serverSource.includes('r.players[0] !== cl') && serverSource.includes('r.players[1].ready'), '伺服器必須只允許房主在對手 ready 後開始遊戲');
 
 console.log('PASS：頁面資源、九套牌組、數字範圍與單機入口均正確');
