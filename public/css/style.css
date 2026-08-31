@@ -188,8 +188,10 @@ body{
   box-shadow:0 4px 0 rgba(91,70,54,.22);overflow:hidden}
 .card .fc.back{background:var(--pink)}
 .card .fc.back svg{width:100%;height:100%;display:block}
-.card .fc.front{transform:rotateY(180deg);background:var(--cardbg,#fff);padding:8%}
-.card .fc.front svg{width:100%;height:100%;display:block}
+.card .fc.front{transform:rotateY(180deg);background:var(--cardbg,#fff);padding:5% 7% 3%;flex-direction:column;gap:2px}
+.card .fc.front svg{width:100%;height:100%;min-height:0;flex:1 1 0;display:block}
+.card-label{display:block;flex:0 0 auto;max-width:100%;padding:1px 4px;border:1px solid rgba(91,70,54,.2);border-radius:999px;background:rgba(255,253,248,.92);color:var(--ink);font-size:clamp(.42rem,.85vw,.68rem);font-weight:900;line-height:1.15;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board[data-size="8"] .card-label{padding:1px 2px;font-size:clamp(.38rem,.62vw,.5rem)}
 .card:active .in{transform:scale(.95)}
 .card.open:active .in,.card.matched:active .in{transform:rotateY(180deg)}
 .card.matched{animation:pop .45s ease}

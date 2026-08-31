@@ -56,6 +56,11 @@
   w.addEventListener('resize', resize);
   w.addEventListener('orientationchange', function () { setTimeout(resize, 200); });
 
+  function cardFront(ic) {
+    return '<svg viewBox="0 0 100 100">' + ic.svg + '</svg>' +
+      '<span class="card-label">' + esc(ic.label || '') + '</span>';
+  }
+
   function buildBoard() {
     var deck = w.DECKS[S.deck];
     var html = '';
@@ -63,10 +68,11 @@
       var ic = deck.icons[S.layout[i] % deck.icons.length];
       html += '<div class="card" data-i="' + i + '"><div class="in">' +
         '<div class="fc back">' + w.UI.cardBack() + '</div>' +
-        '<div class="fc front" style="--cardbg:' + (deck.bg || '#fff') + '"><svg viewBox="0 0 100 100">' + ic.svg + '</svg></div>' +
+        '<div class="fc front" style="--cardbg:' + (deck.bg || '#fff') + '">' + cardFront(ic) + '</div>' +
         '</div><span class="matchmark"><span class="matchcheck">✓</span><span class="matchowner"></span></span></div>';
     }
     el.board.innerHTML = html;
+    el.board.setAttribute('data-size', S.size);
     S.cards = el.board.querySelectorAll('.card');
     resize();
   }
@@ -441,7 +447,9 @@
       var deck = w.DECKS[S.deck];
       var ic = deck.icons[sym % deck.icons.length];
       var front = S.cards[i].querySelector('.front svg');
-      if (front) front.innerHTML = ic.svg;
+      var frontBox = S.cards[i].querySelector('.front');
+      if (frontBox) frontBox.innerHTML = cardFront(ic);
+      else if (front) front.innerHTML = ic.svg;
       S.open.push(i);
       S.cards[i].classList.add('open');
       w.Sound.play('flip');

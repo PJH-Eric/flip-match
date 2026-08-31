@@ -32,6 +32,7 @@ const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 
 deckFiles.forEach((deck) => {
   vm.runInContext(read(path.join(publicDir, 'js', 'decks', `${deck}.js`)), sandbox, { filename: `${deck}.js` });
   assert.strictEqual(sandbox.DECKS[deck].icons.length, 32, `${deck} 牌組必須有 32 種牌面`);
+  assert.ok(sandbox.DECKS[deck].icons.every((icon) => icon.label && icon.label.trim()), `${deck} 每張牌都必須有中文名稱`);
 });
 
 const realisticSource = read(path.join(publicDir, 'js', 'decks', 'realistic.js'));
@@ -128,8 +129,11 @@ const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const styleSource = read(path.join(publicDir, 'css', 'style.css'));
 assert.ok(gameSource.includes('renderOnlineSummary') && gameSource.includes('summaryEvent'), '線上對戰必須即時更新摘要與行動紀錄');
 assert.ok(gameSource.includes("classList.toggle('online-mode'"), '線上對戰必須顯示摘要與聊天室側欄');
+assert.ok(gameSource.includes('cardFront(ic)') && gameSource.includes('class="card-label"'), '翻開牌面時必須顯示中文名稱');
+assert.ok(gameSource.includes('data-size'), '棋盤必須標示尺寸以調整小牌面的文字');
+assert.ok(styleSource.includes('.card-label{') && styleSource.includes('.board[data-size="8"] .card-label{'), '牌面中文名稱必須有響應式樣式');
 const onlineFlip = gameSource.slice(gameSource.indexOf('flip: function (i, sym'), gameSource.indexOf('result: function (a, b'));
-assert.ok(onlineFlip.includes('updateStat();'), '線上翻第一張牌後必須刷新提示按鈕狀態');
+assert.ok(onlineFlip.includes('cardFront(ic)') && onlineFlip.includes('updateStat();'), '線上翻牌時必須同步更新圖案與中文名稱');
 
 const keptOpenMatches = gameSource.match(/classList\.add\('open', 'matched'\)/g) || [];
 assert.strictEqual(keptOpenMatches.length, 4, '單機與線上成功配對後兩張牌都必須保持翻開');
