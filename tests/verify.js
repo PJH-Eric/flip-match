@@ -34,6 +34,16 @@ deckFiles.forEach((deck) => {
   assert.strictEqual(sandbox.DECKS[deck].icons.length, 32, `${deck} 牌組必須有 32 種牌面`);
 });
 
+const realisticSource = read(path.join(publicDir, 'js', 'decks', 'realistic.js'));
+vm.runInContext(realisticSource, sandbox, { filename: 'realistic.js' });
+['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food'].forEach((deck) => {
+  assert.ok(sandbox.DECKS[deck].icons.some((icon) => icon.svg.includes('assets/noto/emoji_u')), `${deck} 必須使用本地百科式 SVG 圖示`);
+});
+assert.ok(realisticSource.includes('assets/noto/emoji_u'), '百科式圖示必須由本地資源載入');
+assert.ok(!realisticSource.includes('raw.githubusercontent.com'), '遊戲執行時不可依賴外部圖示網址');
+assert.ok(fs.existsSync(path.join(publicDir, 'assets', 'noto', 'LICENSE')), 'Noto Emoji 資源必須附帶授權檔');
+assert.ok(fs.readdirSync(path.join(publicDir, 'assets', 'noto')).filter((file) => file.endsWith('.svg')).length >= 170, '本地百科式圖示資源不完整');
+
 vm.runInContext(read(path.join(publicDir, 'js', 'game.js')), sandbox, { filename: 'game.js' });
 [
   [4, 8],
