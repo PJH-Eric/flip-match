@@ -236,8 +236,7 @@
   function applyResult(a, b, match, byId) {
     if (match) {
       S.matched[a] = true; S.matched[b] = true; S.matchedCount += 2;
-      S.cards[a].classList.add('matched'); S.cards[b].classList.add('matched');
-      S.cards[a].classList.remove('open'); S.cards[b].classList.remove('open');
+      S.cards[a].classList.add('open', 'matched'); S.cards[b].classList.add('open', 'matched');
       S.scores[byId] = (S.scores[byId] || 0) + 1;
       if (S.ai) S.ai.remove(a, b);
       w.Sound.play('match');
@@ -401,8 +400,7 @@
       S.scores = scores;
       if (match) {
         S.matched[a] = true; S.matched[b] = true; S.matchedCount += 2;
-        S.cards[a].classList.add('matched'); S.cards[b].classList.add('matched');
-        S.cards[a].classList.remove('open'); S.cards[b].classList.remove('open');
+        S.cards[a].classList.add('open', 'matched'); S.cards[b].classList.add('open', 'matched');
         w.Sound.play('match');
       } else {
         S.cards[a].classList.add('wrong'); S.cards[b].classList.add('wrong');

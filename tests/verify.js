@@ -59,4 +59,7 @@ const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const onlineFlip = gameSource.slice(gameSource.indexOf('flip: function (i, sym)'), gameSource.indexOf('result: function (a, b'));
 assert.ok(onlineFlip.includes('updateStat();'), '線上翻第一張牌後必須刷新提示按鈕狀態');
 
+const keptOpenMatches = gameSource.match(/classList\.add\('open', 'matched'\)/g) || [];
+assert.strictEqual(keptOpenMatches.length, 4, '單機與線上成功配對後兩張牌都必須保持翻開');
+
 console.log('PASS：頁面資源、七套牌組、數字範圍與單機入口均正確');
