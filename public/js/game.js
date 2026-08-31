@@ -23,9 +23,12 @@
   function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function sample(n, k) { var a = []; for (var i = 0; i < n; i++) a.push(i); shuffle(a); return a.slice(0, k); }
 
-  function makeLayout(size) {
+  var SEQ_DECKS = ['numbers'];
+  function makeLayout(size, deckId) {
     var pairs = size * size / 2;
-    var picks = sample(32, Math.min(pairs, 32));
+    var picks;
+    if (SEQ_DECKS.indexOf(deckId) >= 0) { picks = []; for (var k = 0; k < Math.min(pairs, 32); k++) picks.push(k); }
+    else picks = sample(32, Math.min(pairs, 32));
     var cells = [];
     for (var i = 0; i < pairs; i++) { var s = picks[i % picks.length]; cells.push(s, s); }
     return shuffle(cells);
@@ -87,7 +90,10 @@
     }
     var hl = S.hints[S.meId] || 0;
     el.hintLeft.textContent = hl;
-    el.hintBtn.disabled = !(hl > 0 && S.phase === 'play' && !S.busy && S.players[S.cur] && S.players[S.cur].id === S.meId);
+    var canHint = hl > 0 && S.phase === 'play' && !S.busy && S.open.length === 1 &&
+      S.players[S.cur] && S.players[S.cur].id === S.meId;
+    el.hintBtn.disabled = !canHint;
+    el.hintBtn.title = hl <= 0 ? '提示已用完' : (S.open.length === 1 ? '直接翻出配對的另一張' : '先翻開第一張牌才能使用提示');
   }
   function fmt(ms) { var s = Math.floor(ms / 1000); return (Math.floor(s / 60)) + ':' + ('0' + (s % 60)).slice(-2); }
 
@@ -271,27 +277,36 @@
   }
 
   /* ---------------- 提示 ---------------- */
+  /* 提示規則：玩家必須先自己翻開第一張牌，按下提示後直接翻出配對的另一張 */
   function useHint() {
     if (!S || S.phase !== 'play' || S.busy) return;
     if ((S.hints[S.meId] || 0) <= 0) return;
-    if (S.players[S.cur].id !== S.meId) return;
+    if (!S.players[S.cur] || S.players[S.cur].id !== S.meId) return;
+    if (S.open.length !== 1) { toast('先翻開第一張牌，再按提示', 1600); return; }
     if (S.mode === 'online') { w.Net.hint(); return; }
-    var map = {}, a = -1, b = -1;
+
+    var first = S.open[0], sym = S.layout[first], target = -1;
     for (var i = 0; i < S.layout.length; i++) {
-      if (S.matched[i] || S.open.indexOf(i) >= 0) continue;
-      var s = S.layout[i];
-      if (map[s] !== undefined) { a = map[s]; b = i; break; }
-      map[s] = i;
+      if (i === first || S.matched[i]) continue;
+      if (S.layout[i] === sym) { target = i; break; }
     }
-    if (a < 0) return;
+    if (target < 0) return;
     S.hints[S.meId]--;
-    showHint(a, b);
+    w.Sound.play('hint');
+    S.cards[target].classList.add('hint');
+    updateStat();
+    setTimeout(function () {
+      if (!S || S.phase !== 'play') return;
+      S.cards[target].classList.remove('hint');
+      doFlip(target);
+      resolveLocal();
+    }, 620);
   }
 
-  function showHint(a, b) {
+  function hintUsed(byId, left) {
+    if (!S) return;
+    S.hints[byId] = left;
     w.Sound.play('hint');
-    S.cards[a].classList.add('hint'); S.cards[b].classList.add('hint');
-    setTimeout(function () { S.cards[a].classList.remove('hint'); S.cards[b].classList.remove('hint'); }, 1900);
     updateStat();
   }
 
@@ -330,12 +345,12 @@
     S = {
       mode: cfg.mode, size: cfg.size, deck: cfg.deck,
       rule: RULES[cfg.size],
-      layout: cfg.layout || makeLayout(cfg.size),
+      layout: cfg.layout || makeLayout(cfg.size, cfg.deck),
       matched: [], matchedCount: 0, open: [], cur: cfg.cur || 0,
       players: cfg.players, meId: cfg.meId, scores: {}, hints: {},
       moves: 0, timeouts: 0, phase: 'init', busy: false,
       turnStart: 0, pausedAt: 0, playStart: 0,
-      ai: cfg.aiLevel ? w.AI.create(cfg.aiLevel) : null,
+      ai: null,
       onEnd: cfg.onEnd,
       elapsed: function () { return this.playStart ? Date.now() - this.playStart : 0; },
       me: function () { var m = null; this.players.forEach(function (p) { if (p.id === S.meId) m = p; }); return m; }
@@ -379,6 +394,7 @@
       S.cards[i].classList.add('open');
       w.Sound.play('flip');
       if (S.open.length === 2) { S.busy = true; S.pausedAt = Date.now(); }
+      updateStat();
     },
     result: function (a, b, match, scores, byId) {
       if (!S) return;
@@ -408,11 +424,7 @@
       S.open = [];
       toast('⏰ 時間到，換人！', 1500);
     },
-    hint: function (a, b, byId, left) {
-      if (!S) return;
-      S.hints[byId] = left;
-      showHint(a, b);
-    },
+    hintUsed: function (byId, left) { hintUsed(byId, left); },
     end: function (scores, winnerId) {
       if (!S) return;
       S.scores = scores;

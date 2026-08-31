@@ -139,7 +139,8 @@ const RULES = {
   6: { memory: 20, turn: 20, hints: 2 },
   8: { memory: 30, turn: 30, hints: 3 }
 };
-const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery'];
+const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'numbers'];
+const SEQ_DECKS = ['numbers'];
 const ICONS_PER_DECK = 32;
 
 const clients = new Map();   // id -> client
@@ -189,7 +190,9 @@ function clearTimers(r) {
 function startGame(r) {
   const rule = RULES[r.size];
   const pairs = (r.size * r.size) / 2;
-  const picks = sample(ICONS_PER_DECK, Math.min(pairs, ICONS_PER_DECK));
+  var picks;
+  if (SEQ_DECKS.indexOf(r.deck) >= 0) { picks = []; for (var pi = 0; pi < Math.min(pairs, ICONS_PER_DECK); pi++) picks.push(pi); }
+  else picks = sample(ICONS_PER_DECK, Math.min(pairs, ICONS_PER_DECK));
   const cells = [];
   for (let i = 0; i < pairs; i++) cells.push(picks[i % picks.length], picks[i % picks.length]);
   shuffle(cells);
@@ -279,17 +282,19 @@ function onHint(cl) {
   if (!r || r.state !== 'play' || r.busy) return;
   if (r.players[r.cur].id !== cl.id) return;
   if ((r.hintsLeft[cl.id] || 0) <= 0) return;
-  const map = {};
+  // 新規則：必須先自己翻開第一張牌，提示會直接翻出配對的另一張
+  if (r.open.length !== 1) return;
+  const first = r.open[0];
+  const sym = r.layout[first];
+  let target = -1;
   for (let i = 0; i < r.layout.length; i++) {
-    if (r.matched[i] || r.open.indexOf(i) >= 0) continue;
-    const s = r.layout[i];
-    if (map[s] !== undefined) {
-      r.hintsLeft[cl.id]--;
-      bcast(r, { t: 'hint', a: map[s], b: i, by: cl.id, left: r.hintsLeft[cl.id] });
-      return;
-    }
-    map[s] = i;
+    if (i === first || r.matched[i]) continue;
+    if (r.layout[i] === sym) { target = i; break; }
   }
+  if (target < 0) return;
+  r.hintsLeft[cl.id]--;
+  bcast(r, { t: 'hintuse', by: cl.id, left: r.hintsLeft[cl.id] });
+  onFlip(cl, target);
 }
 
 function leaveRoom(cl, silent) {

@@ -20,7 +20,6 @@
       <div class="logo" id="logo"></div>
       <div class="home-btns">
         <button class="btn3d big" data-color="pink"   id="b-solo"><span class="ico">🎯</span>單機挑戰</button>
-        <button class="btn3d big" data-color="mint"   id="b-ai"><span class="ico">🤖</span>對戰電腦</button>
         <button class="btn3d big" data-color="sky"    id="b-online"><span class="ico">🌐</span>線上對戰</button>
         <div class="home-row">
           <button class="btn3d" data-color="lemon" id="b-rank"><span class="ico">🏆</span>排行榜</button>
@@ -52,15 +51,6 @@
 
       <h3 class="lbl">選擇牌組</h3>
       <div class="opt-row deck-row" id="opt-deck"></div>
-
-      <div id="ai-block">
-        <h3 class="lbl">電腦強度</h3>
-        <div class="opt-row" id="opt-ai">
-          <button class="optcard" data-v="easy"><b>簡單</b><span class="s">🐣</span><span class="t">記性不太好</span></button>
-          <button class="optcard" data-v="normal"><b>普通</b><span class="s">🐰</span><span class="t">會記一些牌</span></button>
-          <button class="optcard" data-v="hard"><b>困難</b><span class="s">🦊</span><span class="t">過目不忘</span></button>
-        </div>
-      </div>
 
       <div class="panel-foot">
         <button class="btn3d big" data-color="pink" id="b-start">開始遊戲 ▶</button>
@@ -177,7 +167,7 @@
       </div>
       <div class="helpbody">
         <h3>怎麼玩？</h3>
-        <p>開場會先掀開全部的牌讓你<b>記住位置</b>，時間到就全部蓋起來。接著每次翻兩張，圖案一樣就配對成功並得 1 分，<b>而且可以繼續翻</b>；翻錯就換對手。把全部的牌配完就結束。</p>
+        <p>開場會先掀開全部的牌讓你<b>記住位置</b>，時間到就全部蓋起來。接著每次翻兩張，圖案一樣就<b>配對成功、得 1 分，那兩張會一直保持翻開不再蓋回去</b>，而且可以繼續翻；翻錯才換對手。把全部的牌配完就結束。</p>
         <h3>三種難度</h3>
         <table class="htable">
           <tr><th>難度</th><th>牌數</th><th>記憶時間</th><th>每回合限時</th><th>提示</th></tr>
@@ -188,7 +178,7 @@
         <h3>回合限時</h3>
         <p>輪到你之後會開始倒數，最後 3 秒會有<b>滴答提醒音</b>。時間到還沒翻完兩張，這一回合就結束換人（單機模式則是扣分並重新開始回合）。</p>
         <h3>提示</h3>
-        <p>按下 💡 會幫你亮出一組確定成對的牌，用完就沒有囉。</p>
+        <p>提示要<b>先自己翻開第一張牌</b>才能按。按下 💡 之後會直接幫你翻出跟它成對的另一張，穩穩拿下一分。用完就沒有囉。</p>
         <h3>線上對戰</h3>
         <p>在電腦上執行 <code>啟動遊戲.bat</code>，畫面會顯示一組網址。同一個 Wi-Fi 下的平板打開那組網址，就能在大廳看到彼此的房間並開始對戰。</p>
       </div>
@@ -203,9 +193,10 @@
 <script src="js/decks/fruits.js"></script>
 <script src="js/decks/characters.js"></script>
 <script src="js/decks/stationery.js"></script>
+<script src="js/decks/food.js"></script>
+<script src="js/decks/numbers.js"></script>
 <script src="js/svgui.js"></script>
 <script src="js/audio.js"></script>
-<script src="js/ai.js"></script>
 <script src="js/game.js"></script>
 <script src="js/online.js"></script>
 <script src="js/app.js"></script>

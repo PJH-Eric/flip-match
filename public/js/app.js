@@ -5,15 +5,14 @@
   function q(id) { return D.getElementById(id); }
   function qa(sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); }
 
-  var DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery'];
+  var DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'numbers'];
   var AVATARS = ['🐱', '🐻', '🐰', '🐼', '🦊', '🐧'];
 
-  var opt = { size: 4, deck: 'animals', ai: 'normal' };
+  var opt = { size: 4, deck: 'animals' };
   try {
     var saved = JSON.parse(localStorage.getItem('fm_opt') || '{}');
     if ([4, 6, 8].indexOf(saved.size) >= 0) opt.size = saved.size;
     if (DECK_IDS.indexOf(saved.deck) >= 0) opt.deck = saved.deck;
-    if (['easy', 'normal', 'hard'].indexOf(saved.ai) >= 0) opt.ai = saved.ai;
   } catch (e) {}
   function saveOpt() { try { localStorage.setItem('fm_opt', JSON.stringify(opt)); } catch (e) {} }
 
@@ -62,35 +61,23 @@
   }
 
   /* ---------- 設定畫面 ---------- */
-  function openSetup(mode) {
-    pendingMode = mode;
-    q('setup-title').textContent = mode === 'solo' ? '單機挑戰' : '對戰電腦';
-    q('ai-block').style.display = mode === 'ai' ? '' : 'none';
+  function openSetup() {
+    pendingMode = 'solo';
+    q('setup-title').textContent = '單機挑戰';
     markRow(q('opt-size'), opt.size);
     markRow(q('opt-deck'), opt.deck);
-    markRow(q('opt-ai'), opt.ai);
     go('s-setup');
   }
 
   function startLocal() {
-    var players, aiLevel = null;
     var meId = 'me';
-    if (pendingMode === 'solo') {
-      players = [{ id: 'me', name: '你', avatar: AVATARS[0], type: 'me' }];
-    } else {
-      aiLevel = opt.ai;
-      var conf = w.AI.CONF[aiLevel];
-      players = [
-        { id: 'me', name: '你', avatar: AVATARS[0], type: 'me' },
-        { id: 'cpu', name: conf.name, avatar: conf.avatar, type: 'ai' }
-      ];
-    }
-    lastCfg = { mode: pendingMode, size: opt.size, deck: opt.deck, aiLevel: aiLevel, players: players, meId: meId };
+    var players = [{ id: 'me', name: '你', avatar: AVATARS[0], type: 'me' }];
+    lastCfg = { mode: 'solo', size: opt.size, deck: opt.deck, players: players, meId: meId };
     go('s-game');
-    w.Sound.startBgm('game');
+    if (w.Sound.isMusicOn()) w.Sound.startBgm('game');
     w.Game.start({
-      mode: pendingMode, size: opt.size, deck: opt.deck,
-      players: players, meId: meId, aiLevel: aiLevel,
+      mode: 'solo', size: opt.size, deck: opt.deck,
+      players: players, meId: meId,
       cur: 0, onEnd: showResult
     });
   }
@@ -170,6 +157,8 @@
       var b = e.target.closest('.joinbtn');
       if (!b) return;
       w.Sound.play('click');
+      var nick = q('nickname').value || ('玩家' + Math.floor(Math.random() * 90 + 10));
+      w.Net.setName(nick);
       w.Net.join(b.getAttribute('data-id'));
     };
   }
@@ -218,7 +207,6 @@
     buildDeckRow(q('ropt-deck'), function (v) { if (room && room.hostId === w.Net.id()) w.Net.setopt(room.size, v); });
     markRow(q('opt-size'), opt.size);
     markRow(q('opt-deck'), opt.deck);
-    markRow(q('opt-ai'), opt.ai);
 
     D.addEventListener('pointerdown', function once() {
       w.Sound.unlock();
@@ -234,17 +222,12 @@
       var b = e.target.closest('.optcard'); if (!b) return;
       w.Sound.play('click'); opt.size = +b.getAttribute('data-v'); saveOpt(); markRow(q('opt-size'), opt.size);
     };
-    q('opt-ai').onclick = function (e) {
-      var b = e.target.closest('.optcard'); if (!b) return;
-      w.Sound.play('click'); opt.ai = b.getAttribute('data-v'); saveOpt(); markRow(q('opt-ai'), opt.ai);
-    };
     q('ropt-size').onclick = function (e) {
       var b = e.target.closest('.optcard'); if (!b || !room || room.hostId !== w.Net.id()) return;
       w.Sound.play('click'); w.Net.setopt(+b.getAttribute('data-v'), room.deck);
     };
 
-    q('b-solo').onclick = function () { w.Sound.play('click'); openSetup('solo'); };
-    q('b-ai').onclick = function () { w.Sound.play('click'); openSetup('ai'); };
+    q('b-solo').onclick = function () { w.Sound.play('click'); openSetup(); };
     q('b-rank').onclick = function () { w.Sound.play('click'); go('s-rank'); };
     q('b-help').onclick = function () { w.Sound.play('click'); go('s-help'); };
     q('b-start').onclick = function () { w.Sound.play('start'); startLocal(); };
@@ -334,7 +317,7 @@
     w.Net.on('flip', function (m) { w.Game.net.flip(m.i, m.sym); });
     w.Net.on('result', function (m) { w.Game.net.result(m.a, m.b, m.match, m.scores, m.by); });
     w.Net.on('timeout', function (m) { w.Game.net.timeout(m.close); });
-    w.Net.on('hint', function (m) { w.Game.net.hint(m.a, m.b, m.by, m.left); });
+    w.Net.on('hintuse', function (m) { w.Game.net.hintUsed(m.by, m.left); });
     w.Net.on('end', function (m) { w.Game.net.end(m.scores, m.winner); });
     w.Net.on('oppLeft', function (m) {
       w.Game.stop();
