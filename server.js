@@ -139,9 +139,10 @@ const RULES = {
   6: { memory: 20, turn: 20, hints: 2 },
   8: { memory: 30, turn: 30, hints: 3 }
 };
-const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers'];
+const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics'];
 const SEQ_DECKS = ['numbers'];
 const ICONS_PER_DECK = 32;
+const DECK_ICON_COUNTS = { phonetics: 37 };
 
 const clients = new Map();   // id -> client
 const rooms = new Map();     // id -> room
@@ -196,9 +197,10 @@ function clearTimers(r) {
 function startGame(r) {
   const rule = RULES[r.size];
   const pairs = (r.size * r.size) / 2;
+  const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;
   var picks;
-  if (SEQ_DECKS.indexOf(r.deck) >= 0) { picks = []; for (var pi = 0; pi < Math.min(pairs, ICONS_PER_DECK); pi++) picks.push(pi); }
-  else picks = sample(ICONS_PER_DECK, Math.min(pairs, ICONS_PER_DECK));
+  if (SEQ_DECKS.indexOf(r.deck) >= 0) { picks = []; for (var pi = 0; pi < Math.min(pairs, iconCount); pi++) picks.push(pi); }
+  else picks = sample(iconCount, Math.min(pairs, iconCount));
   const cells = [];
   for (let i = 0; i < pairs; i++) cells.push(picks[i % picks.length], picks[i % picks.length]);
   shuffle(cells);

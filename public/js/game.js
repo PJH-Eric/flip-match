@@ -28,9 +28,11 @@
   var SEQ_DECKS = ['numbers'];
   function makeLayout(size, deckId) {
     var pairs = size * size / 2;
+    var deck = w.DECKS && w.DECKS[deckId];
+    var iconCount = deck && deck.icons ? deck.icons.length : 32;
     var picks;
-    if (SEQ_DECKS.indexOf(deckId) >= 0) { picks = []; for (var k = 0; k < Math.min(pairs, 32); k++) picks.push(k); }
-    else picks = sample(32, Math.min(pairs, 32));
+    if (SEQ_DECKS.indexOf(deckId) >= 0) { picks = []; for (var k = 0; k < Math.min(pairs, iconCount); k++) picks.push(k); }
+    else picks = sample(iconCount, Math.min(pairs, iconCount));
     var cells = [];
     for (var i = 0; i < pairs; i++) { var s = picks[i % picks.length]; cells.push(s, s); }
     return shuffle(cells);

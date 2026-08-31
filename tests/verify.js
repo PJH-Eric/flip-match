@@ -28,10 +28,11 @@ sandbox.window = sandbox;
 sandbox.addEventListener = function () {};
 vm.createContext(sandbox);
 
-const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers'];
+const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics'];
+const deckExpectedCounts = { phonetics: 37 };
 deckFiles.forEach((deck) => {
   vm.runInContext(read(path.join(publicDir, 'js', 'decks', `${deck}.js`)), sandbox, { filename: `${deck}.js` });
-  assert.strictEqual(sandbox.DECKS[deck].icons.length, 32, `${deck} 牌組必須有 32 種牌面`);
+  assert.strictEqual(sandbox.DECKS[deck].icons.length, deckExpectedCounts[deck] || 32, `${deck} 牌組牌面數量不正確`);
   assert.ok(sandbox.DECKS[deck].icons.every((icon) => icon.label && icon.label.trim()), `${deck} 每張牌都必須有中文名稱`);
 });
 assert.strictEqual(new Set(sandbox.DECKS.flags.icons.map((icon) => icon.svg)).size, 32, '各國國旗牌組必須有 32 種不同旗幟');
@@ -121,6 +122,9 @@ const serverSource = read(path.join(root, 'server.js'));
 assert.ok(joinHandler.includes('w.Net.setName(nick);'), '加入房間前必須先同步暱稱');
 assert.ok(appSource.includes("'flags'"), '前端牌組選單必須包含各國國旗');
 assert.ok(serverSource.includes("'flags'"), '伺服器必須允許各國國旗牌組');
+assert.ok(scriptSources.includes('js/decks/phonetics.js'), '頁面必須載入注音符號牌組');
+assert.ok(appSource.includes("'phonetics'"), '前端牌組選單必須包含注音符號');
+assert.ok(serverSource.includes("'phonetics'"), '伺服器必須允許注音符號牌組');
 assert.ok(html.includes('id="invite-url"') && html.includes('id="b-copyinvite"'), '房間必須提供邀請連結與複製按鈕');
 assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享按鈕');
 assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
@@ -142,6 +146,8 @@ assert.ok(onlineSource.includes('setopt: function (size, deck, first)'), 'WebSoc
 const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const styleSource = read(path.join(publicDir, 'css', 'style.css'));
 assert.ok(gameSource.includes('renderOnlineSummary') && gameSource.includes('summaryEvent'), '線上對戰必須即時更新摘要與行動紀錄');
+assert.ok(gameSource.includes('var iconCount = deck && deck.icons ? deck.icons.length : 32;'), '遊戲版面必須依牌組圖示數量產生配對');
+assert.ok(serverSource.includes('const DECK_ICON_COUNTS = { phonetics: 37 };') && serverSource.includes('const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;'), '線上伺服器必須支援 37 個注音符號牌面');
 assert.ok(gameSource.includes("classList.toggle('online-mode'"), '線上對戰必須顯示摘要與聊天室側欄');
 assert.ok(gameSource.includes('cardFront(ic)') && gameSource.includes('class="card-label"'), '翻開牌面時必須顯示中文名稱');
 assert.ok(gameSource.includes('data-size'), '棋盤必須標示尺寸以調整小牌面的文字');
@@ -169,4 +175,4 @@ assert.ok(serverSource.includes('fromId: cl.id') && serverSource.includes('Date.
 assert.ok(serverSource.includes('function pruneEmptyRooms') && serverSource.includes('r.players.length > 0'), '空房間不得出現在房間列表');
 assert.ok(serverSource.includes("r.cur = r.first === 'guest'"), '伺服器必須依房主設定決定先手');
 
-console.log('PASS：頁面資源、八套牌組、數字範圍與單機入口均正確');
+console.log('PASS：頁面資源、九套牌組、數字範圍與單機入口均正確');
