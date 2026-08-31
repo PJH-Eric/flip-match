@@ -192,13 +192,13 @@ body{
 .card .fc.back svg{width:100%;height:100%;display:block}
 .card .fc.front{transform:rotateY(180deg);background:var(--cardbg,#fff);padding:5% 7% 3%;flex-direction:column;gap:2px}
 .card .fc.front svg{width:100%;height:100%;min-height:0;flex:1 1 0;display:block}
-.card-label{display:block;flex:0 0 auto;max-width:100%;padding:1px 4px;border:1px solid rgba(91,70,54,.2);border-radius:999px;background:rgba(255,253,248,.92);color:var(--ink);font-size:clamp(.42rem,.85vw,.68rem);font-weight:900;line-height:1.15;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.board[data-size="8"] .card-label{padding:1px 2px;font-size:clamp(.38rem,.62vw,.5rem)}
+.card-label{display:block;flex:0 0 auto;max-width:100%;padding:2px 7px 3px;border:2px solid rgba(91,70,54,.28);border-radius:10px;background:linear-gradient(180deg,#fffefb 0%,#fff2f7 100%);color:var(--ink);font-size:clamp(.5rem,.98vw,.76rem);font-weight:900;letter-spacing:.02em;line-height:1.15;text-align:center;text-shadow:0 1px 0 rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 0 rgba(91,70,54,.14),inset 0 1px 0 rgba(255,255,255,.8)}
+.board[data-size="8"] .card-label{padding:1px 2px 2px;border-width:1px;border-radius:7px;font-size:clamp(.46rem,.72vw,.58rem);letter-spacing:-.02em;box-shadow:0 1px 0 rgba(91,70,54,.14),inset 0 1px 0 rgba(255,255,255,.8)}
 .card:active .in{transform:scale(.95)}
 .card.open:active .in,.card.matched:active .in{transform:rotateY(180deg)}
 .card.matched{animation:pop .45s ease}
 .card.matched .fc{box-shadow:0 0 0 4px var(--mint),0 4px 0 rgba(91,70,54,.22)}
-.card.matched .in,.card.matched:active .in{transform:none;opacity:.72}
+.card.matched .in,.card.matched:active .in{transform:none;opacity:.86}
 .card.matched .fc.back{visibility:hidden}
 .card.matched .fc.front{z-index:2;transform:none}
 .matchmark{position:absolute;z-index:4;top:-4px;right:-4px;display:none;width:58%;align-items:center;justify-content:flex-end;pointer-events:none}

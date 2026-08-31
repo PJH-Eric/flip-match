@@ -28,12 +28,14 @@ sandbox.window = sandbox;
 sandbox.addEventListener = function () {};
 vm.createContext(sandbox);
 
-const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'numbers'];
+const deckFiles = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers'];
 deckFiles.forEach((deck) => {
   vm.runInContext(read(path.join(publicDir, 'js', 'decks', `${deck}.js`)), sandbox, { filename: `${deck}.js` });
   assert.strictEqual(sandbox.DECKS[deck].icons.length, 32, `${deck} 牌組必須有 32 種牌面`);
   assert.ok(sandbox.DECKS[deck].icons.every((icon) => icon.label && icon.label.trim()), `${deck} 每張牌都必須有中文名稱`);
 });
+assert.strictEqual(new Set(sandbox.DECKS.flags.icons.map((icon) => icon.svg)).size, 32, '各國國旗牌組必須有 32 種不同旗幟');
+assert.strictEqual(new Set(sandbox.DECKS.flags.icons.map((icon) => icon.label)).size, 32, '各國國旗牌組的國家名稱不可重複');
 
 const realisticSource = read(path.join(publicDir, 'js', 'decks', 'realistic.js'));
 vm.runInContext(realisticSource, sandbox, { filename: 'realistic.js' });
@@ -115,7 +117,10 @@ assert.ok(!html.includes('id="opt-ai"'), '設定畫面不應再顯示電腦強�
 
 const appSource = read(path.join(publicDir, 'js', 'app.js'));
 const joinHandler = appSource.slice(appSource.indexOf('host.onclick'), appSource.indexOf('function renderRoom()'));
+const serverSource = read(path.join(root, 'server.js'));
 assert.ok(joinHandler.includes('w.Net.setName(nick);'), '加入房間前必須先同步暱稱');
+assert.ok(appSource.includes("'flags'"), '前端牌組選單必須包含各國國旗');
+assert.ok(serverSource.includes("'flags'"), '伺服器必須允許各國國旗牌組');
 assert.ok(html.includes('id="invite-url"') && html.includes('id="b-copyinvite"'), '房間必須提供邀請連結與複製按鈕');
 assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享按鈕');
 assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
@@ -147,8 +152,7 @@ assert.ok(styleSource.includes('.game-chat{display:flex;flex:1;min-height:220px'
 assert.ok(styleSource.includes('#s-game.online-mode .boardwrap{transform:translateX(calc(var(--online-side) / 2))'), '線上棋盤必須補回側欄佔用的置中位移');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
-const serverSource = read(path.join(root, 'server.js'));
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
 assert.ok(serverSource.includes('fromId: cl.id') && serverSource.includes('Date.now()'), '伺服器聊天室訊息必須帶有發送者與時間');
 
-console.log('PASS：頁面資源、七套牌組、數字範圍與單機入口均正確');
+console.log('PASS：頁面資源、八套牌組、數字範圍與單機入口均正確');

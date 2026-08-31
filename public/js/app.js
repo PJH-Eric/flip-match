@@ -5,7 +5,7 @@
   function q(id) { return D.getElementById(id); }
   function qa(sel, root) { return Array.prototype.slice.call((root || D).querySelectorAll(sel)); }
 
-  var DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'numbers'];
+  var DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers'];
   var AVATARS = ['🐱', '🐻', '🐰', '🐼', '🦊', '🐧'];
 
   var opt = { size: 4, deck: 'animals' };
