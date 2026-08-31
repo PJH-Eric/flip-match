@@ -90,7 +90,8 @@ body{
 .optcard .s{font-size:1.5rem;font-weight:800}
 .optcard .t{font-size:.78rem;color:var(--ink-soft)}
 .optcard.on{background:var(--lemon);border-color:var(--ink);box-shadow:0 6px 0 var(--lemon-d)}
-.deck-row .optcard{flex:1 1 120px}
+.deck-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.deck-row .optcard{min-width:0}
 .deck-row .dpv{display:flex;gap:4px;justify-content:center;margin-top:2px}
 .deck-row .dpv svg{width:30px;height:30px}
 
@@ -290,6 +291,7 @@ body{
   .gfoot{padding:4px 10px 8px}
 }
 @media (max-width:560px){
+  .deck-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .seats{gap:8px}
   .seat{padding:10px}
   .nick input{width:120px}

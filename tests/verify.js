@@ -152,6 +152,8 @@ assert.ok(onlineSource.includes('start: function'), 'WebSocket 用戶端必須�
 
 const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const styleSource = read(path.join(publicDir, 'css', 'style.css'));
+assert.ok(styleSource.includes('.deck-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))'), '牌組選擇必須在寬版分成上下各五張');
+assert.ok(styleSource.includes('@media (max-width:560px){') && styleSource.includes('.deck-row{grid-template-columns:repeat(2,minmax(0,1fr))}'), '窄版牌組選擇必須改為兩欄以維持觸控尺寸');
 assert.ok(gameSource.includes('renderOnlineSummary') && gameSource.includes('summaryEvent'), '線上對戰必須即時更新摘要與行動紀錄');
 assert.ok(gameSource.includes('var iconCount = deck && deck.icons ? deck.icons.length : 32;'), '遊戲版面必須依牌組圖示數量產生配對');
 assert.ok(serverSource.includes('const DECK_ICON_COUNTS = { phonetics: 37 };') && serverSource.includes('const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;'), '線上伺服器必須支援 37 個注音符號牌面');
