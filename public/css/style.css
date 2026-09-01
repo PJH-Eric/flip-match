@@ -188,8 +188,8 @@ body{
 .timerbar .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:900;letter-spacing:.06em}
 
 .gamebody{position:relative;display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px;--online-side:0px}
-.boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:2px 8px}
-.board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bs);
+.boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:2px 8px;touch-action:manipulation}
+.board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bs);touch-action:manipulation;
   grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--cols),1fr)}
 .online-tools{display:none;position:absolute;inset:0;z-index:5;pointer-events:none;padding:8px 10px;overflow:hidden}
 #s-game.online-mode .online-tools{display:block}
@@ -216,7 +216,7 @@ body{
 #s-game.online-mode .chat-toggle{display:inline-flex}
 #s-game.online-mode.chat-open .chat-toggle{background:var(--mint)}
 
-.card{position:relative;perspective:800px;cursor:pointer}
+.card{position:relative;perspective:800px;cursor:pointer;touch-action:manipulation}
 .card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .36s cubic-bezier(.4,1.4,.5,1)}
 .card.open .in,.card.matched .in{transform:rotateY(180deg)}
 .card .fc{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
@@ -346,6 +346,18 @@ body{
   .game-chat{min-height:0}
 }
 @media (orientation:landscape) and (max-height:520px){
+  #s-game.active{overflow-y:auto;overflow-x:hidden}
+  #s-game .gbar{padding:0 6px}
+  #s-game .gbar .btn3d.small{min-height:36px;padding:4px 10px calc(4px + var(--d));font-size:.8rem}
+  #s-game .scorebar{gap:4px;padding:2px 4px 1px}
+  #s-game .pcard{gap:4px;padding:3px 8px}
+  #s-game .pcard .pav{font-size:1.1rem}
+  #s-game .pcard .pn{font-size:.82rem}
+  #s-game .pcard .ps{font-size:1.05rem}
+  #s-game .timerbar{margin:1px 8px 3px;height:14px}
+  #s-game .gamebody{flex:0 0 clamp(280px,calc(100dvh - 10px),420px);min-height:280px;overflow:visible}
+  #s-game .boardwrap{flex:0 0 auto;width:100%;height:100%;min-height:0;padding:4px}
+  #s-game .gfoot{min-height:52px;padding:2px 8px 6px}
   #s-home.active{align-items:flex-start;overflow-y:auto}
   #s-home .home-wrap{padding-top:12px;padding-bottom:12px}
   .scorebar{padding:4px}

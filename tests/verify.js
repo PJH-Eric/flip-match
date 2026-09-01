@@ -190,6 +190,7 @@ assert.ok(styleSource.includes('min-height:100dvh') && styleSource.includes('env
 assert.ok(styleSource.includes('@media (orientation:portrait) and (max-width:820px)') && styleSource.includes('#s-game .gamebody{flex-direction:column;'), '直向裝置必須改用可捲動的單欄遊戲版面');
 assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-home.active{align-items:flex-start;'), '橫向窄高裝置必須避免主選單上下裁切');
 assert.ok(styleSource.includes('@media (max-width:1100px), (max-height:760px)') && styleSource.includes('.gbar{padding:4px 8px 0}') && styleSource.includes('.gamebody{gap:4px;padding:0 4px 2px}'), '小視窗必須壓縮外框留白並放大可操作棋盤');
+assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-game.active{overflow-y:auto;') && styleSource.includes('#s-game .boardwrap{flex:0 0 auto;') && styleSource.includes('touch-action:manipulation'), '橫向窄高遊戲必須保留可捲動的大棋盤與觸控操作區');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
