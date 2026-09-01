@@ -191,7 +191,7 @@ assert.ok(styleSource.includes('@media (orientation:portrait) and (max-width:820
 assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-home.active{align-items:flex-start;'), '橫向窄高裝置必須避免主選單上下裁切');
 assert.ok(styleSource.includes('@media (max-width:1100px), (max-height:760px)') && styleSource.includes('.gbar{padding:4px 8px 0}') && styleSource.includes('.gamebody{gap:4px;padding:0 4px 2px}'), '小視窗必須壓縮外框留白並放大可操作棋盤');
 assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-game.active{overflow-y:auto;') && styleSource.includes('#s-game .boardwrap{flex:0 0 auto;') && styleSource.includes('touch-action:manipulation'), '橫向窄高遊戲必須保留可捲動的大棋盤與觸控操作區');
-assert.ok(styleSource.includes('.screen{padding-right:calc(64px + env(safe-area-inset-right))}'), '小視窗主要內容必須避開右上角設定入口');
+assert.ok(styleSource.includes('.btn3d.settings-fab{top:calc(6px + env(safe-area-inset-top));right:calc(6px + env(safe-area-inset-right));') && styleSource.includes('.home-wrap .logo{width:calc(100% - 68px)}') && styleSource.includes('#s-game .gbar{padding-right:60px}') && styleSource.includes('.panel-head{padding-right:56px}'), '小視窗設定入口必須避開內容且保留主要寬度');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');
