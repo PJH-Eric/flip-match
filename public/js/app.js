@@ -26,7 +26,7 @@
   var lastCfg = null;
   var inviteRoomId = readInviteRoom();
   var inviteAttempted = false;
-  var settingsLastFocus = null;
+  var settingsLastFocus = null, settingsHistory = false;
 
   function readInviteRoom() {
     var source = (location.search || '') + '&' + (location.hash || '');
@@ -117,10 +117,15 @@
     q('settings-motion').checked = motionOn;
   }
 
-  function setSettingsOpen(open) {
+  function setSettingsOpen(open, fromHistory) {
     var modal = q('settings-modal');
     if (!modal) return;
-    if (open) settingsLastFocus = D.activeElement;
+    if (open) {
+      settingsLastFocus = D.activeElement;
+      if (!settingsHistory && !fromHistory) {
+        try { history.pushState({ fmSettings: true }, '', location.href); settingsHistory = true; } catch (e) {}
+      }
+    }
     modal.classList.toggle('open', !!open);
     modal.setAttribute('aria-hidden', open ? 'false' : 'true');
     q('b-settings').setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -130,6 +135,10 @@
     } else if (settingsLastFocus && typeof settingsLastFocus.focus === 'function') {
       settingsLastFocus.focus();
       settingsLastFocus = null;
+      if (settingsHistory && !fromHistory) {
+        settingsHistory = false;
+        try { history.back(); } catch (e) {}
+      }
     }
   }
 
@@ -373,7 +382,20 @@
       b.addEventListener('click', function () { setSettingsOpen(false); });
     });
     D.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && q('settings-modal').classList.contains('open')) setSettingsOpen(false);
+      var modal = q('settings-modal');
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') { setSettingsOpen(false); return; }
+      if (e.key !== 'Tab') return;
+      var focusable = Array.prototype.slice.call(modal.querySelectorAll('button,input,select,textarea,[href],[tabindex]:not([tabindex="-1"])')).filter(function (node) {
+        return !node.disabled && node.offsetParent !== null;
+      });
+      if (!focusable.length) { e.preventDefault(); return; }
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && D.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && D.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    w.addEventListener('popstate', function () {
+      if (settingsHistory) { settingsHistory = false; setSettingsOpen(false, true); }
     });
     q('settings-music').onchange = function () {
       if (this.checked !== w.Sound.isMusicOn()) {

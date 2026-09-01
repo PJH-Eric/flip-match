@@ -149,6 +149,7 @@ assert.ok(appSource.includes('開始遊戲 ▶') && appSource.includes('w.Net.st
 assert.ok(appSource.includes('對手離開了遊戲，對戰即將結束') && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
 assert.ok(appSource.includes("classList.toggle('chat-open')") && appSource.includes("setAttribute('aria-expanded'"), '聊天室必須點擊後才展開並同步可及性狀態');
 assert.ok(appSource.includes('setSettingsOpen') && appSource.includes('syncSettings') && appSource.includes('settings-music-volume'), '設定彈窗必須同步音訊狀態與音量');
+assert.ok(appSource.includes('history.pushState') && appSource.includes("e.key !== 'Tab'") && appSource.includes("setSettingsOpen(false, true)"), '設定彈窗必須支援返回鍵與鍵盤焦點循環');
 assert.ok(audioSource.includes('setMusicVolume') && audioSource.includes('setSfxVolume') && audioSource.includes('getMusicVolume') && audioSource.includes('getSfxVolume'), '音訊模組必須支援獨立音量');
 assert.ok(audioSource.includes('setHaptic') && audioSource.includes('vibrate'), '音訊模組必須提供可關閉的觸控震動');
 const onlineSource = read(path.join(publicDir, 'js', 'online.js'));
@@ -185,6 +186,9 @@ assert.ok(styleSource.includes('.chat-toggle{display:none}') && styleSource.incl
 assert.ok(styleSource.includes('.settings-fab{position:fixed;') && styleSource.includes('.settings-modal.open{display:flex}'), '設定入口必須固定顯示且能開啟彈窗');
 assert.ok(styleSource.includes('.setting-range input{') && styleSource.includes('.setting-toggle input:checked'), '設定彈窗必須有音量滑桿與開關樣式');
 assert.ok(styleSource.includes('.reduced-motion *'), '設定彈窗必須提供減少動畫的顯示選項');
+assert.ok(styleSource.includes('min-height:100dvh') && styleSource.includes('env(safe-area-inset-right)'), '頁面必須支援動態視窗高度與安全區');
+assert.ok(styleSource.includes('@media (orientation:portrait) and (max-width:820px)') && styleSource.includes('#s-game .gamebody{flex-direction:column;'), '直向裝置必須改用可捲動的單欄遊戲版面');
+assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-home.active{align-items:flex-start;'), '橫向窄高裝置必須避免主選單上下裁切');
 assert.ok(styleSource.includes('@media (max-width:1100px), (max-height:760px)') && styleSource.includes('.gbar{padding:4px 8px 0}') && styleSource.includes('.gamebody{gap:4px;padding:0 4px 2px}'), '小視窗必須壓縮外框留白並放大可操作棋盤');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
