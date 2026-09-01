@@ -294,6 +294,7 @@ body{
 
 /* ---------- 平板／手機調整 ---------- */
 @media (max-width:820px){
+  .screen{padding-right:calc(64px + env(safe-area-inset-right))}
   .panel{width:calc(100% - 24px);margin:12px auto 20px;padding:14px 14px 20px;border-radius:22px}
   .panel-head h2{font-size:1.25rem}
   .panel-head .spacer{width:70px}
