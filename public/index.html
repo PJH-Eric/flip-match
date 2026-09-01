@@ -14,6 +14,8 @@
 
 <div id="app">
 
+  <button class="btn3d icononly settings-fab" data-color="cream" id="b-settings" type="button" title="開啟遊戲設定" aria-label="開啟遊戲設定" aria-haspopup="dialog" aria-controls="settings-modal" aria-expanded="false">⚙️</button>
+
   <!-- ============ 主選單 ============ -->
   <section class="screen active" id="s-home">
     <div class="home-wrap">
@@ -26,10 +28,6 @@
           <button class="btn3d" data-color="lilac" id="b-help"><span class="ico">📖</span>玩法</button>
         </div>
       </div>
-    </div>
-    <div class="topright">
-      <button class="btn3d icononly sound-toggle" data-color="cream" id="b-music" title="背景音樂：開啟" aria-label="背景音樂：開啟" aria-pressed="true">🎵</button>
-      <button class="btn3d icononly sound-toggle" data-color="cream" id="b-sfx" title="音效：開啟" aria-label="音效：開啟" aria-pressed="true">🔊</button>
     </div>
   </section>
 
@@ -130,10 +128,6 @@
     <header class="gbar">
       <button class="btn3d small" data-color="cream" id="b-quit">◀ 離開</button>
       <div class="gmeta"><span id="g-mode">單機</span><span class="dot">·</span><span id="g-diff">簡單</span><span class="dot">·</span><span id="g-deck">動物</span></div>
-      <div class="gbar-right">
-        <button class="btn3d icononly small sound-toggle" data-color="cream" id="b-music2" title="背景音樂：開啟" aria-label="背景音樂：開啟" aria-pressed="true">🎵</button>
-        <button class="btn3d icononly small sound-toggle" data-color="cream" id="b-sfx2" title="音效：開啟" aria-label="音效：開啟" aria-pressed="true">🔊</button>
-      </div>
     </header>
 
     <div class="scorebar" id="scorebar"></div>
@@ -218,11 +212,61 @@
         <p>輪到你之後會開始倒數，最後 3 秒會有<b>滴答提醒音</b>。時間到還沒翻完兩張，這一回合就結束換人（單機模式則是扣分並重新開始回合）。</p>
         <h3>提示</h3>
         <p>提示要<b>先自己翻開第一張牌</b>才能按。按下 💡 之後會直接幫你翻出跟它成對的另一張，穩穩拿下一分。用完就沒有囉。</p>
+        <h3>遊戲設定</h3>
+        <p>每個畫面右上角的 ⚙️ 都能調整背景音樂與翻牌音效的開關、音量，還可以開關觸控震動與翻牌動畫。</p>
         <h3>線上對戰</h3>
         <p>在電腦上執行 <code>啟動遊戲.bat</code>，畫面會顯示一組網址。同一個 Wi-Fi 下的平板打開那組網址，就能在大廳看到彼此的房間並開始對戰。</p>
       </div>
     </div>
   </section>
+
+  <!-- ============ 遊戲設定彈窗 ============ -->
+  <div class="settings-modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-hidden="true">
+    <div class="settings-backdrop" data-settings-close></div>
+    <section class="settings-panel" id="settings-panel" tabindex="-1">
+      <div class="settings-head">
+        <h2 id="settings-title">⚙ 遊戲設定</h2>
+        <button class="settings-close" id="settings-close" type="button" aria-label="關閉遊戲設定">✕</button>
+      </div>
+
+      <div class="settings-group">
+        <h3>聲音</h3>
+        <label class="setting-toggle" for="settings-music">
+          <span><b>背景音樂</b><small id="settings-music-status">開啟</small></span>
+          <input id="settings-music" type="checkbox" checked>
+        </label>
+        <label class="setting-range" for="settings-music-volume">
+          <span>音樂音量 <output id="settings-music-volume-value">100%</output></span>
+          <input id="settings-music-volume" type="range" min="0" max="100" step="5" value="100">
+        </label>
+        <label class="setting-toggle" for="settings-sfx">
+          <span><b>翻牌音效</b><small id="settings-sfx-status">開啟</small></span>
+          <input id="settings-sfx" type="checkbox" checked>
+        </label>
+        <label class="setting-range" for="settings-sfx-volume">
+          <span>音效音量 <output id="settings-sfx-volume-value">100%</output></span>
+          <input id="settings-sfx-volume" type="range" min="0" max="100" step="5" value="100">
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>操作</h3>
+        <label class="setting-toggle" for="settings-haptic">
+          <span><b>觸控震動</b><small>平板翻牌時輕微震動</small></span>
+          <input id="settings-haptic" type="checkbox" checked>
+        </label>
+        <label class="setting-toggle" for="settings-motion">
+          <span><b>翻牌動畫</b><small>關閉可減少動態效果</small></span>
+          <input id="settings-motion" type="checkbox" checked>
+        </label>
+      </div>
+
+      <div class="settings-foot">
+        <button class="settings-reset" id="settings-reset" type="button">恢復預設</button>
+        <button class="settings-done" id="settings-done" type="button">完成</button>
+      </div>
+    </section>
+  </div>
 
 </div>
 

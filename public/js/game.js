@@ -271,6 +271,7 @@
     S.open.push(i);
     S.cards[i].classList.add('open');
     w.Sound.play('flip');
+    w.Sound.vibrate(8);
     if (S.ai) S.ai.observe(i, S.layout[i]);
     if (S.open.length === 2 && S.mode === 'solo') S.moves++;
     if (S.open.length === 2 && S.mode === 'ai') S.moves++;
@@ -297,9 +298,11 @@
       S.scores[byId] = (S.scores[byId] || 0) + 1;
       if (S.ai) S.ai.remove(a, b);
       w.Sound.play('match');
+      w.Sound.vibrate([12, 35, 12]);
     } else {
       S.cards[a].classList.add('wrong'); S.cards[b].classList.add('wrong');
       w.Sound.play('wrong');
+      w.Sound.vibrate(35);
       (function (x, y) {
         setTimeout(function () {
           x.classList.remove('open', 'wrong'); y.classList.remove('open', 'wrong');
@@ -458,6 +461,7 @@
       S.open.push(i);
       S.cards[i].classList.add('open');
       w.Sound.play('flip');
+      w.Sound.vibrate(8);
       if (S.open.length === 2) { S.busy = true; S.pausedAt = Date.now(); }
       summaryEvent(playerName(byId || (S.players[S.cur] && S.players[S.cur].id)) + ' 翻開第 ' + (i + 1) + ' 張牌');
       updateStat();
@@ -470,10 +474,12 @@
         S.cards[a].classList.add('open', 'matched'); S.cards[b].classList.add('open', 'matched');
         markMatched(a, byId); markMatched(b, byId);
         w.Sound.play('match');
+        w.Sound.vibrate([12, 35, 12]);
         summaryEvent(playerName(byId) + ' 配對成功！');
       } else {
         S.cards[a].classList.add('wrong'); S.cards[b].classList.add('wrong');
         w.Sound.play('wrong');
+        w.Sound.vibrate(35);
         (function (x, y) { setTimeout(function () { x.classList.remove('open', 'wrong'); y.classList.remove('open', 'wrong'); }, 220); })(S.cards[a], S.cards[b]);
         summaryEvent(playerName(byId) + ' 配對失敗，換回合');
       }
@@ -488,6 +494,7 @@
     timeout: function (closeArr) {
       if (!S) return;
       w.Sound.play('timeup');
+      w.Sound.vibrate([30, 40, 30]);
       (closeArr || []).forEach(function (i) { S.cards[i].classList.remove('open'); });
       S.open = [];
       toast('⏰ 時間到，換人！', 1500);

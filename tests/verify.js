@@ -119,6 +119,7 @@ assert.ok(!html.includes('id="b-ai"'), '首頁不應再顯示電腦對戰');
 assert.ok(!html.includes('id="opt-ai"'), '設定畫面不應再顯示電腦強度');
 
 const appSource = read(path.join(publicDir, 'js', 'app.js'));
+const audioSource = read(path.join(publicDir, 'js', 'audio.js'));
 const joinHandler = appSource.slice(appSource.indexOf('host.onclick'), appSource.indexOf('function renderRoom()'));
 const serverSource = read(path.join(root, 'server.js'));
 assert.ok(joinHandler.includes('w.Net.setName(nick);'), '加入房間前必須先同步暱稱');
@@ -135,7 +136,10 @@ assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享�
 assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
 assert.ok(html.includes('id="room-chatform"') && html.includes('id="game-chatform"'), '房間與對戰畫面都必須提供聊天室輸入');
 assert.ok(html.includes('id="b-gamechat"') && html.includes('aria-controls="game-chatbox"'), '對戰聊天室必須提供可展開的控制按鈕');
-assert.ok((html.match(/sound-toggle/g) || []).length >= 4, '音樂與音效按鈕必須標示音量開關狀態');
+assert.ok(html.includes('id="b-settings"') && html.includes('aria-controls="settings-modal"'), '每個畫面必須共用遊戲設定入口');
+assert.ok(!html.includes('id="b-music"') && !html.includes('id="b-sfx"') && !html.includes('id="b-music2"') && !html.includes('id="b-sfx2"'), '頁面不應再分散放置音樂與音效按鈕');
+assert.ok(html.includes('id="settings-modal"') && html.includes('id="settings-music"') && html.includes('id="settings-sfx"'), '設定彈窗必須提供音樂與音效開關');
+assert.ok(html.includes('id="settings-music-volume"') && html.includes('id="settings-sfx-volume"'), '設定彈窗必須提供音樂與音效音量控制');
 assert.ok(html.includes('id="ropt-first"') && html.includes('data-v="host"') && html.includes('data-v="guest"'), '房間設定必須提供先手玩家選項');
 assert.ok(appSource.includes('readInviteRoom') && appSource.includes('w.Net.join(inviteRoomId)'), '邀請連結開啟頁面後必須自動嘗試加入房間');
 assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
@@ -144,7 +148,9 @@ assert.ok(appSource.includes("markRow(q('ropt-first')") && appSource.includes("w
 assert.ok(appSource.includes('開始遊戲 ▶') && appSource.includes('w.Net.start()') && appSource.includes('opponentReady') && appSource.includes('等待對手準備…'), '房主必須在對手 ready 後顯示開始遊戲');
 assert.ok(appSource.includes('對手離開了遊戲，對戰即將結束') && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
 assert.ok(appSource.includes("classList.toggle('chat-open')") && appSource.includes("setAttribute('aria-expanded'"), '聊天室必須點擊後才展開並同步可及性狀態');
-assert.ok(appSource.includes("aria-pressed") && appSource.includes('背景音樂：') && appSource.includes('音效：'), '音樂與音效狀態必須同步更新可見與可及性提示');
+assert.ok(appSource.includes('setSettingsOpen') && appSource.includes('syncSettings') && appSource.includes('settings-music-volume'), '設定彈窗必須同步音訊狀態與音量');
+assert.ok(audioSource.includes('setMusicVolume') && audioSource.includes('setSfxVolume') && audioSource.includes('getMusicVolume') && audioSource.includes('getSfxVolume'), '音訊模組必須支援獨立音量');
+assert.ok(audioSource.includes('setHaptic') && audioSource.includes('vibrate'), '音訊模組必須提供可關閉的觸控震動');
 const onlineSource = read(path.join(publicDir, 'js', 'online.js'));
 assert.ok(onlineSource.includes('chat: function'), 'WebSocket 用戶端必須提供聊天室訊息方法');
 assert.ok(onlineSource.includes('setopt: function (size, deck, first)'), 'WebSocket 用戶端必須傳送先手設定');
@@ -159,6 +165,7 @@ assert.ok(gameSource.includes('var iconCount = deck && deck.icons ? deck.icons.l
 assert.ok(serverSource.includes('const DECK_ICON_COUNTS = { phonetics: 37 };') && serverSource.includes('const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;'), '線上伺服器必須支援 37 個注音符號牌面');
 assert.ok(gameSource.includes("classList.toggle('online-mode'"), '線上對戰必須顯示摘要與聊天室側欄');
 assert.ok(gameSource.includes('cardFront(ic)') && gameSource.includes('class="card-label"'), '翻開牌面時必須顯示中文名稱');
+assert.ok(gameSource.includes('w.Sound.vibrate'), '翻牌、配對與逾時必須可觸發觸控震動');
 assert.ok(gameSource.includes('data-size'), '棋盤必須標示尺寸以調整小牌面的文字');
 assert.ok(styleSource.includes('.card-label{') && styleSource.includes('.board[data-size="8"] .card-label{'), '牌面中文名稱必須有響應式樣式');
 const onlineFlip = gameSource.slice(gameSource.indexOf('flip: function (i, sym'), gameSource.indexOf('result: function (a, b'));
@@ -175,7 +182,9 @@ assert.ok(styleSource.includes('.online-tools{display:none;position:absolute;ins
 assert.ok(styleSource.includes('.summary-card{position:absolute;top:8px;right:10px;'), '即時戰況必須固定在右上角');
 assert.ok(styleSource.includes('.game-chat{position:absolute;left:10px;bottom:8px;') && styleSource.includes('#s-game.online-mode.chat-open .game-chat{display:flex;'), '對戰聊天室必須預設隱藏並在左下角展開');
 assert.ok(styleSource.includes('.chat-toggle{display:none}') && styleSource.includes('#s-game.online-mode .chat-toggle{display:inline-flex}'), '聊天室按鈕只應在對戰中顯示');
-assert.ok(styleSource.includes('.sound-toggle::after') && styleSource.includes('.sound-toggle.off::after{content:"✕"'), '關閉音樂或音效時必須顯示 X 標記');
+assert.ok(styleSource.includes('.settings-fab{position:fixed;') && styleSource.includes('.settings-modal.open{display:flex}'), '設定入口必須固定顯示且能開啟彈窗');
+assert.ok(styleSource.includes('.setting-range input{') && styleSource.includes('.setting-toggle input:checked'), '設定彈窗必須有音量滑桿與開關樣式');
+assert.ok(styleSource.includes('.reduced-motion *'), '設定彈窗必須提供減少動畫的顯示選項');
 assert.ok(styleSource.includes('@media (max-width:1100px), (max-height:760px)') && styleSource.includes('.gbar{padding:4px 8px 0}') && styleSource.includes('.gamebody{gap:4px;padding:0 4px 2px}'), '小視窗必須壓縮外框留白並放大可操作棋盤');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');

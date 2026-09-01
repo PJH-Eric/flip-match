@@ -3,15 +3,30 @@
   'use strict';
 
   var ctx = null, master = null, musicGain = null, sfxGain = null;
-  var musicOn = true, sfxOn = true;
+  var musicOn = true, sfxOn = true, musicVolume = 1, sfxVolume = 1, hapticOn = true;
   var timer = null, step = 0, nextTime = 0, curTrack = 'menu';
   var TEMPO = 108;                       // BPM
   var STEP = 15 / TEMPO;                 // 十六分音符秒數
 
   function load(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v === '1'; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} }
+  function loadVolume(k, d) {
+    try {
+      var v = parseFloat(localStorage.getItem(k));
+      return isFinite(v) ? Math.max(0, Math.min(1, v)) : d;
+    } catch (e) { return d; }
+  }
+  function saveVolume(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
   musicOn = load('fm_music', true);
   sfxOn = load('fm_sfx', true);
+  musicVolume = loadVolume('fm_music_volume', 1);
+  sfxVolume = loadVolume('fm_sfx_volume', 1);
+  hapticOn = load('fm_haptic', true);
+
+  function applyGain() {
+    if (musicGain) musicGain.gain.value = musicOn ? 0.16 * musicVolume : 0;
+    if (sfxGain) sfxGain.gain.value = sfxOn ? 0.55 * sfxVolume : 0;
+  }
 
   function ensure() {
     if (ctx) return ctx;
@@ -19,8 +34,9 @@
     if (!AC) return null;
     ctx = new AC();
     master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
-    musicGain = ctx.createGain(); musicGain.gain.value = musicOn ? 0.16 : 0; musicGain.connect(master);
-    sfxGain = ctx.createGain(); sfxGain.gain.value = sfxOn ? 0.55 : 0; sfxGain.connect(master);
+    musicGain = ctx.createGain(); musicGain.connect(master);
+    sfxGain = ctx.createGain(); sfxGain.connect(master);
+    applyGain();
     return ctx;
   }
   function unlock() {
@@ -166,23 +182,46 @@
 
   function toggleMusic() {
     musicOn = !musicOn; save('fm_music', musicOn);
-    ensure();
-    if (musicGain) musicGain.gain.value = musicOn ? 0.16 : 0;
+    ensure(); applyGain();
     if (musicOn) startBgm();
     return musicOn;
   }
   function toggleSfx() {
     sfxOn = !sfxOn; save('fm_sfx', sfxOn);
-    ensure();
-    if (sfxGain) sfxGain.gain.value = sfxOn ? 0.55 : 0;
+    ensure(); applyGain();
     if (sfxOn) play('click');
     return sfxOn;
+  }
+
+  function setMusicVolume(value) {
+    musicVolume = Math.max(0, Math.min(1, Number(value) || 0));
+    saveVolume('fm_music_volume', musicVolume);
+    ensure(); applyGain();
+    return musicVolume;
+  }
+  function setSfxVolume(value) {
+    sfxVolume = Math.max(0, Math.min(1, Number(value) || 0));
+    saveVolume('fm_sfx_volume', sfxVolume);
+    ensure(); applyGain();
+    return sfxVolume;
+  }
+  function setHaptic(on) {
+    hapticOn = !!on; save('fm_haptic', hapticOn);
+    return hapticOn;
+  }
+  function vibrate(pattern) {
+    if (!hapticOn || !w.navigator || typeof w.navigator.vibrate !== 'function') return;
+    try { w.navigator.vibrate(pattern || 10); } catch (e) {}
   }
 
   w.Sound = {
     unlock: unlock, play: play, startBgm: startBgm, stopBgm: stopBgm, setTrack: setTrack,
     toggleMusic: toggleMusic, toggleSfx: toggleSfx,
+    setMusicVolume: setMusicVolume, setSfxVolume: setSfxVolume, setHaptic: setHaptic, vibrate: vibrate,
     isMusicOn: function () { return musicOn; },
-    isSfxOn: function () { return sfxOn; }
+    isSfxOn: function () { return sfxOn; },
+    getMusicVolume: function () { return musicVolume; },
+    getSfxVolume: function () { return sfxVolume; },
+    isHapticOn: function () { return hapticOn; }
   };
 })(window);

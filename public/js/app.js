@@ -16,12 +16,17 @@
   } catch (e) {}
   function saveOpt() { try { localStorage.setItem('fm_opt', JSON.stringify(opt)); } catch (e) {} }
 
+  var motionOn = true;
+  try { motionOn = localStorage.getItem('fm_motion') !== '0'; } catch (e) {}
+  function saveMotion() { try { localStorage.setItem('fm_motion', motionOn ? '1' : '0'); } catch (e) {} }
+
   var cur = 's-home';
   var pendingMode = 'solo';
   var room = null;
   var lastCfg = null;
   var inviteRoomId = readInviteRoom();
   var inviteAttempted = false;
+  var settingsLastFocus = null;
 
   function readInviteRoom() {
     var source = (location.search || '') + '&' + (location.hash || '');
@@ -90,6 +95,42 @@
     if (id === 's-game') setTimeout(w.Game.resize, 60);
     if (id === 's-rank') renderRank();
     setTimeout(function () { qa('.btn3d', q(id)).forEach(w.UI.paint); }, 30);
+  }
+
+  function applyMotion() {
+    D.documentElement.classList.toggle('reduced-motion', !motionOn);
+  }
+
+  function syncSettings() {
+    var musicOn = w.Sound.isMusicOn(), sfxOn = w.Sound.isSfxOn();
+    var musicVolume = Math.round(w.Sound.getMusicVolume() * 100);
+    var sfxVolume = Math.round(w.Sound.getSfxVolume() * 100);
+    q('settings-music').checked = musicOn;
+    q('settings-sfx').checked = sfxOn;
+    q('settings-music-volume').value = musicVolume;
+    q('settings-sfx-volume').value = sfxVolume;
+    q('settings-music-volume-value').textContent = musicVolume + '%';
+    q('settings-sfx-volume-value').textContent = sfxVolume + '%';
+    q('settings-music-status').textContent = musicOn ? '開啟' : '關閉';
+    q('settings-sfx-status').textContent = sfxOn ? '開啟' : '關閉';
+    q('settings-haptic').checked = w.Sound.isHapticOn();
+    q('settings-motion').checked = motionOn;
+  }
+
+  function setSettingsOpen(open) {
+    var modal = q('settings-modal');
+    if (!modal) return;
+    if (open) settingsLastFocus = D.activeElement;
+    modal.classList.toggle('open', !!open);
+    modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+    q('b-settings').setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      syncSettings();
+      q('settings-panel').focus();
+    } else if (settingsLastFocus && typeof settingsLastFocus.focus === 'function') {
+      settingsLastFocus.focus();
+      settingsLastFocus = null;
+    }
   }
 
   /* ---------- 牌組選項 ---------- */
@@ -263,28 +304,11 @@
     if (room.players.length < 2) q('sysline').textContent = '等待另一位玩家加入…';
   }
 
-  function syncSoundBtns() {
-    var musicOn = w.Sound.isMusicOn(), sfxOn = w.Sound.isSfxOn();
-    [q('b-music'), q('b-music2')].forEach(function (b) {
-      if (!b) return;
-      b.classList.toggle('off', !musicOn);
-      b.setAttribute('aria-pressed', musicOn ? 'true' : 'false');
-      b.setAttribute('aria-label', '背景音樂：' + (musicOn ? '開啟' : '關閉'));
-      b.title = '背景音樂：' + (musicOn ? '開啟' : '關閉');
-    });
-    [q('b-sfx'), q('b-sfx2')].forEach(function (b) {
-      if (!b) return;
-      b.classList.toggle('off', !sfxOn);
-      b.setAttribute('aria-pressed', sfxOn ? 'true' : 'false');
-      b.setAttribute('aria-label', '音效：' + (sfxOn ? '開啟' : '關閉'));
-      b.title = '音效：' + (sfxOn ? '開啟' : '關閉');
-    });
-  }
-
   /* ---------- 初始化 ---------- */
   function init() {
     w.UI.bgDeco(q('bgdeco'));
     q('logo').innerHTML = w.UI.logo();
+    applyMotion();
     w.UI.decorateAll();
     buildDeckRow(q('opt-deck'), function (v) { opt.deck = v; saveOpt(); markRow(q('opt-deck'), v); });
     buildDeckRow(q('ropt-deck'), function (v) { if (room && room.hostId === w.Net.id()) w.Net.setopt(room.size, v, room.first); });
@@ -339,17 +363,60 @@
       this.setAttribute('aria-expanded', open ? 'true' : 'false');
       q('game-chatbox').setAttribute('aria-hidden', open ? 'false' : 'true');
     };
-    [['b-music', 'b-music2'], ['b-sfx', 'b-sfx2']].forEach(function (pair, k) {
-      pair.forEach(function (id) {
-        var b = q(id); if (!b) return;
-        b.onclick = function () {
-          if (k === 0) { w.Sound.toggleMusic(); if (!w.Sound.isMusicOn()) w.Sound.stopBgm(); }
-          else w.Sound.toggleSfx();
-          syncSoundBtns();
-        };
-      });
+    q('b-settings').onclick = function () {
+      w.Sound.play('click');
+      setSettingsOpen(!q('settings-modal').classList.contains('open'));
+    };
+    q('settings-close').onclick = function () { w.Sound.play('click'); setSettingsOpen(false); };
+    q('settings-done').onclick = function () { w.Sound.play('click'); setSettingsOpen(false); };
+    qa('[data-settings-close]').forEach(function (b) {
+      b.addEventListener('click', function () { setSettingsOpen(false); });
     });
-    syncSoundBtns();
+    D.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && q('settings-modal').classList.contains('open')) setSettingsOpen(false);
+    });
+    q('settings-music').onchange = function () {
+      if (this.checked !== w.Sound.isMusicOn()) {
+        w.Sound.toggleMusic();
+        if (this.checked) w.Sound.startBgm(cur === 's-game' ? 'game' : 'menu');
+        else w.Sound.stopBgm();
+      }
+      syncSettings();
+    };
+    q('settings-sfx').onchange = function () {
+      if (this.checked !== w.Sound.isSfxOn()) w.Sound.toggleSfx();
+      syncSettings();
+    };
+    q('settings-music-volume').oninput = function () {
+      var value = Math.max(0, Math.min(100, +this.value || 0));
+      w.Sound.setMusicVolume(value / 100);
+      q('settings-music-volume-value').textContent = value + '%';
+    };
+    q('settings-sfx-volume').oninput = function () {
+      var value = Math.max(0, Math.min(100, +this.value || 0));
+      w.Sound.setSfxVolume(value / 100);
+      q('settings-sfx-volume-value').textContent = value + '%';
+    };
+    q('settings-haptic').onchange = function () { w.Sound.setHaptic(this.checked); syncSettings(); };
+    q('settings-motion').onchange = function () {
+      motionOn = this.checked;
+      saveMotion();
+      applyMotion();
+      syncSettings();
+    };
+    q('settings-reset').onclick = function () {
+      w.Sound.play('click');
+      if (!w.Sound.isMusicOn()) w.Sound.toggleMusic();
+      if (!w.Sound.isSfxOn()) w.Sound.toggleSfx();
+      w.Sound.setMusicVolume(1);
+      w.Sound.setSfxVolume(1);
+      w.Sound.setHaptic(true);
+      motionOn = true;
+      saveMotion();
+      applyMotion();
+      syncSettings();
+    };
+    syncSettings();
 
     q('b-online').onclick = openOnline;
     q('b-refresh').onclick = function () { w.Sound.play('click'); w.Net.rooms(); };
