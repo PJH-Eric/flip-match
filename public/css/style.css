@@ -389,3 +389,22 @@ body{
   #s-game.online-mode .summary-card{position:static;width:100%;max-height:none;min-height:0}
   #s-game.online-mode .game-chat{position:static;width:100%;height:260px}
 }
+
+/* ================================================================
+ * 手機軟體鍵盤修正（js/keyboard.js 量測後寫入 --app-h／--kb）
+ * 鍵盤彈出時把滿版高度改成「真正看得到的高度」，聊天室輸入框才不會
+ * 被鍵盤蓋住；沒有鍵盤時兩個變數都不生效，版面與原本完全一樣。
+ * ================================================================ */
+#app{height:var(--app-h,100%);min-height:var(--app-h,100dvh)}
+
+/* 版面用 user-select:none 防拖曳，但可輸入的欄位一定要能選字 */
+input,textarea,select{user-select:text;-webkit-user-select:text}
+
+/* iOS 對 font-size < 16px 的欄位聚焦時會自動放大整頁，放大後輸入框常被推出畫面 */
+@media (pointer:coarse){
+  .chatbar .field,.chat-form input,.chatform input,
+  #chat-input,#chatInput,#room-chatinput,#game-chatinput{font-size:16px}
+}
+
+/* 對戰畫面的聊天室在矮畫面會把輸入列頂出去，鍵盤打開時縮一點 */
+body.kb-open .game-chat{height:min(clamp(180px,42%,280px),calc(var(--app-h,100dvh) - 120px))}
