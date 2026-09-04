@@ -25,7 +25,6 @@
   var room = null;
   var lastCfg = null;
   var inviteRoomId = readInviteRoom();
-  var inviteAttempted = false;
   var settingsLastFocus = null, settingsHistory = false;
 
   function readInviteRoom() {
@@ -79,11 +78,25 @@
     w.Sound.play('click');
     var n = w.Net.savedName();
     if (n) q('nickname').value = n;
+    q('invite-join').hidden = !inviteRoomId;
     q('lobby-note').textContent = inviteRoomId
-      ? '正在透過邀請連結加入房間…'
+      ? '收到房間邀請，請先確認暱稱，再按「以此暱稱加入」。'
       : '同一個 Wi-Fi 底下，另一台平板打開伺服器顯示的網址就能一起玩。';
     go('s-lobby');
     w.Net.connect();
+  }
+
+  function joinInviteRoom() {
+    if (!inviteRoomId) return;
+    var nick = (q('nickname').value || '').trim();
+    if (!nick) {
+      q('lobby-note').textContent = '請先輸入暱稱，再加入邀請房間。';
+      q('nickname').focus();
+      return;
+    }
+    w.Sound.play('click');
+    w.Net.setName(nick);
+    w.Net.join(inviteRoomId);
   }
 
   /* ---------- 畫面切換 ---------- */
@@ -441,6 +454,7 @@
     syncSettings();
 
     q('b-online').onclick = openOnline;
+    q('b-invite-join').onclick = joinInviteRoom;
     q('b-refresh').onclick = function () { w.Sound.play('click'); w.Net.rooms(); };
     q('nickname').onchange = function () { w.Net.setName(q('nickname').value); };
     q('b-copyinvite').onclick = function () {
@@ -487,13 +501,15 @@
       var d = q('conn-dot');
       d.className = 'conn' + (s === 'ok' ? ' ok' : s === 'bad' ? ' bad' : '');
       q('conn-txt').textContent = s === 'ok' ? '已連線' : s === 'bad' ? '連線中斷' : '連線中…';
-      if (s === 'ok' && inviteRoomId && !inviteAttempted) {
-        inviteAttempted = true;
-        setTimeout(function () { w.Net.join(inviteRoomId); }, 120);
-      }
     });
     w.Net.on('rooms', function (m) { if (cur === 's-lobby') renderRooms(m.rooms); });
-    w.Net.on('joined', function () { inviteAttempted = true; clearChatLogs(); q('sysline').textContent = ''; go('s-room'); });
+    w.Net.on('joined', function () {
+      inviteRoomId = '';
+      q('invite-join').hidden = true;
+      clearChatLogs();
+      q('sysline').textContent = '';
+      go('s-room');
+    });
     w.Net.on('room', function (m) {
       room = m.room;
       if (cur === 's-room') renderRoom();
@@ -503,7 +519,11 @@
     w.Net.on('sys', function (m) { q('sysline').textContent = m.m; });
     w.Net.on('err', function (m) {
       var inviteError = !!inviteRoomId;
-      if (inviteError) { inviteRoomId = ''; q('lobby-note').textContent = '邀請連結無法加入，請從大廳選擇房間。'; }
+      if (inviteError) {
+        inviteRoomId = '';
+        q('invite-join').hidden = true;
+        q('lobby-note').textContent = '邀請連結無法加入，請從大廳選擇房間。';
+      }
       showRoomNotice(m.m);
       if (!inviteError) q('lobby-note').textContent = m.m;
     });

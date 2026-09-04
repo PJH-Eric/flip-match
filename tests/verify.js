@@ -133,6 +133,7 @@ assert.ok(appSource.includes("'sports'"), '前端牌組選單必須包含運動'
 assert.ok(serverSource.includes("'sports'"), '伺服器必須允許運動牌組');
 assert.ok(html.includes('id="invite-url"') && html.includes('id="b-copyinvite"'), '房間必須提供邀請連結與複製按鈕');
 assert.ok(html.includes('id="b-shareinvite"'), '房間必須提供系統分享按鈕');
+assert.ok(html.includes('id="invite-join"') && html.includes('id="b-invite-join"'), '被邀請者必須有確認暱稱後加入的入口');
 assert.ok(html.includes('id="summary-progress"') && html.includes('id="summary-feed"'), '對戰畫面必須提供即時摘要');
 assert.ok(html.includes('id="room-chatform"') && html.includes('id="game-chatform"'), '房間與對戰畫面都必須提供聊天室輸入');
 assert.ok(html.includes('id="b-gamechat"') && html.includes('aria-controls="game-chatbox"'), '對戰聊天室必須提供可展開的控制按鈕');
@@ -141,7 +142,7 @@ assert.ok(!html.includes('id="b-music"') && !html.includes('id="b-sfx"') && !htm
 assert.ok(html.includes('id="settings-modal"') && html.includes('id="settings-music"') && html.includes('id="settings-sfx"'), '設定彈窗必須提供音樂與音效開關');
 assert.ok(html.includes('id="settings-music-volume"') && html.includes('id="settings-sfx-volume"'), '設定彈窗必須提供音樂與音效音量控制');
 assert.ok(html.includes('id="ropt-first"') && html.includes('data-v="host"') && html.includes('data-v="guest"'), '房間設定必須提供先手玩家選項');
-assert.ok(appSource.includes('readInviteRoom') && appSource.includes('w.Net.join(inviteRoomId)'), '邀請連結開啟頁面後必須自動嘗試加入房間');
+assert.ok(appSource.includes('readInviteRoom') && appSource.includes('function joinInviteRoom') && appSource.includes('w.Net.setName(nick)') && appSource.includes('w.Net.join(inviteRoomId)'), '邀請連結必須先確認暱稱，再加入房間');
 assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
 assert.ok(appSource.includes("var targetId = cur === 's-game' ? 'game-chatlog' : 'room-chatlog'") && appSource.includes('var host = q(targetId)'), '房間與對戰聊天室訊息不得互相混入');
 assert.ok(appSource.includes("markRow(q('ropt-first')") && appSource.includes("w.Net.setopt(room.size, room.deck, b.getAttribute('data-v'))"), '房主先手選項必須同步到伺服器');
