@@ -26,12 +26,16 @@
     emit('status', 'connecting');
     ws.onopen = function () {
       connected = true; retry = 0;
+      if (w.NetworkLatency) w.NetworkLatency.setProbe(function () {
+        if (ws && ws.readyState === 1) send({ t: 'ping', at: performance.now() });
+      });
       emit('status', 'ok');
       send({ t: 'hello', name: myName });
       send({ t: 'rooms' });
     };
     ws.onclose = function () {
       connected = false;
+      if (w.NetworkLatency) w.NetworkLatency.report(null);
       emit('status', 'bad');
       if (wantOpen) {
         clearTimeout(retryTimer);
@@ -42,6 +46,10 @@
     ws.onerror = function () { emit('status', 'bad'); };
     ws.onmessage = function (ev) {
       var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (m.t === 'pong') {
+        if (w.NetworkLatency && typeof m.at === 'number') w.NetworkLatency.report(performance.now() - m.at);
+        return;
+      }
       if (m.t === 'welcome') { myId = m.id; if (m.name) myName = m.name; }
       emit(m.t, m);
     };

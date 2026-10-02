@@ -102,6 +102,7 @@
   /* ---------- 畫面切換 ---------- */
   function go(id) {
     if (cur === 's-game' && id !== 's-game') w.Game.stop();
+    if (id !== 's-game' && w.NetworkLatency) w.NetworkLatency.setActive(false);
     qa('.screen').forEach(function (s) { s.classList.toggle('active', s.id === id); });
     cur = id;
     w.Sound.setTrack(id === 's-game' ? 'game' : 'menu');
@@ -534,6 +535,7 @@
         return { id: p.id, name: p.name, avatar: AVATARS[i], type: p.id === w.Net.id() ? 'me' : 'remote' };
       });
       lastCfg = { mode: 'online' };
+      if (w.NetworkLatency) w.NetworkLatency.setActive(true);
       go('s-game');
       if (w.Sound.isMusicOn()) w.Sound.startBgm('game');
       var curIdx = 0;
@@ -549,8 +551,9 @@
     w.Net.on('result', function (m) { w.Game.net.result(m.a, m.b, m.match, m.scores, m.by); });
     w.Net.on('timeout', function (m) { w.Game.net.timeout(m.close); });
     w.Net.on('hintuse', function (m) { w.Game.net.hintUsed(m.by, m.left); });
-    w.Net.on('end', function (m) { w.Game.net.end(m.scores, m.winner); });
+    w.Net.on('end', function (m) { if (w.NetworkLatency) w.NetworkLatency.setActive(false); w.Game.net.end(m.scores, m.winner); });
     w.Net.on('oppLeft', function (m) {
+      if (w.NetworkLatency) w.NetworkLatency.setActive(false);
       w.Game.stop();
       w.Game.toast('對手離開了遊戲，對戰即將結束', 1800);
       setTimeout(function () {

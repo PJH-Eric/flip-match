@@ -376,6 +376,9 @@ function handleClient(conn) {
     try { m = JSON.parse(raw); } catch (e) { return; }
     if (!m || typeof m.t !== 'string') return;
     switch (m.t) {
+      case 'ping':
+        conn.sendJSON({ t: 'pong', at: m.at });
+        break;
       case 'hello':
         cl.name = String(m.name || '玩家').slice(0, 12) || '玩家';
         conn.sendJSON({ t: 'welcome', id: cl.id, name: cl.name });
