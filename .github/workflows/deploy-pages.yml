@@ -26,11 +26,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      # 線上對戰伺服器（Render）的網址存在 repository variable SERVER_URL，
+      # 線上對戰伺服器（Render）的網址存在 repository variable GAME_SERVER_URL，
       # 佈署時才寫進 public/js/config.js，不進版控。
       - name: Inject server URL
         env:
-          SERVER_URL: ${{ vars.SERVER_URL }}
+          GAME_SERVER_URL: ${{ vars.GAME_SERVER_URL }}
         run: node scripts/inject-server-url.js
 
       - name: Upload public/ as artifact

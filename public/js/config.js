@@ -4,9 +4,9 @@
  * 所以線上對戰的伺服器（server.js）另外部署在 Render。
  *
  * ⚠️ 下面 REMOTE 這一行不用手動改。
- * 佈署到 GitHub Pages 時，Actions 會用 repository variable `SERVER_URL`
+ * 佈署到 GitHub Pages 時，Actions 會用 repository variable `GAME_SERVER_URL`
  * 的值改寫它（見 scripts/inject-server-url.js）。
- * 設定位置：Settings → Secrets and variables → Actions → Variables → SERVER_URL
+ * 設定位置：Settings → Secrets and variables → Actions → Variables → GAME_SERVER_URL
  *
  * 連線規則：
  *   - 從 localhost 或區網 IP 開啟（自己按「啟動遊戲.bat」跑 node server.js）

@@ -89,7 +89,7 @@ GitHub Pages 只能放靜態檔案，跑不了 WebSocket，所以 `server.js` �
 
    | Name | Value |
    |------|-------|
-   | `SERVER_URL` | `https://你的服務名稱.onrender.com` |
+   | `GAME_SERVER_URL` | `https://你的服務名稱.onrender.com` |
 
 4. 到 **Actions** 分頁把 `Deploy to GitHub Pages` 重跑一次（**Re-run all jobs**），
    線上對戰就會連到 Render。之後改網址只要改這個 variable 再重跑，不用改程式碼。
