@@ -93,6 +93,11 @@
 
   /* ---- 標題 LOGO ---- */
   function logo() {
+    var en = w.I18N && w.I18N.lang === 'en';
+    var title = w.I18N ? w.I18N.t('home.logoTitle') : '翻牌配對碰';
+    var sub = w.I18N ? w.I18N.t('home.logoSub') : '記憶力大挑戰';
+    var tSize = en ? 50 : 56, tSpace = en ? 2 : 4, sSize = en ? 19 : 21, sSpace = en ? 4 : 8;
+    var fam = 'Yuanti TC, PingFang TC, Microsoft JhengHei, Noto Sans TC, sans-serif';
     return '<svg viewBox="0 0 540 190">' +
       '<g transform="translate(14 42) rotate(-13)">' +
         '<rect x="0" y="0" width="72" height="98" rx="14" fill="#A8D8F0" stroke="#5B4636" stroke-width="5"/>' +
@@ -108,13 +113,13 @@
         '<ellipse cx="14" cy="58" rx="7" ry="4.5" fill="#FFAFC5" opacity="0.8"/>' +
         '<ellipse cx="58" cy="58" rx="7" ry="4.5" fill="#FFAFC5" opacity="0.8"/>' +
       '</g>' +
-      '<text x="270" y="84" text-anchor="middle" font-size="56" font-weight="900" letter-spacing="4" ' +
+      '<text x="270" y="84" text-anchor="middle" font-size="' + tSize + '" font-weight="900" letter-spacing="' + tSpace + '" ' +
         'style="paint-order:stroke;stroke:#5B4636;stroke-width:14px;stroke-linejoin:round" fill="#FFB5C5" ' +
-        'font-family="Yuanti TC, PingFang TC, Microsoft JhengHei, Noto Sans TC, sans-serif">翻牌配對碰</text>' +
-      '<text x="270" y="84" text-anchor="middle" font-size="56" font-weight="900" letter-spacing="4" fill="#FFF6C9" ' +
-        'font-family="Yuanti TC, PingFang TC, Microsoft JhengHei, Noto Sans TC, sans-serif">翻牌配對碰</text>' +
-      '<text x="270" y="126" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="8" fill="#8A7261" ' +
-        'font-family="Yuanti TC, PingFang TC, Microsoft JhengHei, Noto Sans TC, sans-serif">記憶力大挑戰</text>' +
+        'font-family="' + fam + '">' + title + '</text>' +
+      '<text x="270" y="84" text-anchor="middle" font-size="' + tSize + '" font-weight="900" letter-spacing="' + tSpace + '" fill="#FFF6C9" ' +
+        'font-family="' + fam + '">' + title + '</text>' +
+      '<text x="270" y="126" text-anchor="middle" font-size="' + sSize + '" font-weight="800" letter-spacing="' + sSpace + '" fill="#8A7261" ' +
+        'font-family="' + fam + '">' + sub + '</text>' +
       '<path d="M150 150 h240" stroke="#FFB5C5" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.7"/>' +
       '</svg>';
   }

@@ -5,8 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node tests/verify.js"
+    "test": "node tests/localization.js && node tests/verify.js",
+    "test:localization": "node tests/localization.js"
   },
-  "engines": { "node": ">=16" },
+  "engines": {
+    "node": ">=16"
+  },
   "license": "MIT"
 }

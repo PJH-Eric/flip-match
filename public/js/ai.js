@@ -15,7 +15,8 @@
     var mem = {};            // index -> symbol
     return {
       level: level,
-      name: cf.name,
+      name: w.I18N ? w.I18N.t('ai.' + level, null, cf.name) : cf.name,
+      nameKey: 'ai.' + (CONF[level] ? level : 'normal'),
       avatar: cf.avatar,
 
       /* 任何一張牌被掀開時呼叫（含對手翻的、記憶時間全開的） */

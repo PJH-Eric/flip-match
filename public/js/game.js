@@ -3,7 +3,12 @@
   'use strict';
 
   var RULES = { 4: { memory: 10, turn: 10, hints: 1 }, 6: { memory: 20, turn: 20, hints: 2 }, 8: { memory: 30, turn: 30, hints: 3 } };
-  var DIFF_NAME = { 4: '簡單', 6: '普通', 8: '困難' };
+  var DIFF_FALLBACK = { 4: '簡單', 6: '普通', 8: '困難' };
+  function T(k, p, f) { return w.I18N ? w.I18N.t(k, p, f) : (f !== undefined ? f : k); }
+  function diffName(size) { return T('diff.' + size, null, DIFF_FALLBACK[size]); }
+  var DIFF_NAME = { get 4() { return diffName(4); }, get 6() { return diffName(6); }, get 8() { return diffName(8); } };
+  function deckLabel(id) { var d = w.DECKS[id]; return T('deck.' + id, null, d ? d.name : id); }
+  function pname(p) { return p.nameKey ? T(p.nameKey) : p.name; }
   var GAPS = { 4: 12, 6: 9, 8: 6 };
 
   var S = null;
@@ -60,7 +65,7 @@
 
   function cardFront(ic) {
     return '<svg viewBox="0 0 100 100">' + ic.svg + '</svg>' +
-      '<span class="card-label">' + esc(ic.label || '') + '</span>';
+      '<span class="card-label" data-label="' + esc(ic.label || '') + '">' + esc(T('card.' + (ic.label || ''), null, ic.label || '')) + '</span>';
   }
 
   function buildBoard() {
@@ -85,7 +90,7 @@
       var p = S.players[i];
       var isTurn = (S.phase === 'play' && S.players[S.cur] === p);
       h += '<div class="pcard' + (isTurn ? ' turn' : '') + '"><span class="pav">' + p.avatar + '</span>' +
-        '<span class="pn">' + esc(p.name) + '</span><span class="ps">' + (S.scores[p.id] || 0) + '</span></div>';
+        '<span class="pn">' + esc(pname(p)) + '</span><span class="ps">' + (S.scores[p.id] || 0) + '</span></div>';
     }
     el.scorebar.innerHTML = h;
     renderOnlineSummary();
@@ -100,67 +105,73 @@
     var mark = card.querySelector('.matchmark');
     mark.className = 'matchmark';
     mark.querySelector('.matchowner').textContent = '';
-    mark.title = '配對成功';
+    mark.setAttribute('data-by', byId || '');
+    mark.title = T('game.matched');
     if (S.players.length > 1 && player) {
       mark.classList.add('show-owner', 'owner-' + (playerIndex % 2));
       mark.querySelector('.matchowner').textContent = player.avatar;
-      mark.title = player.name + ' 配對成功';
+      mark.title = T('game.matchedBy', { name: pname(player) });
     }
   }
 
   function playerName(id) {
-    if (!S || !id) return '玩家';
-    for (var i = 0; i < S.players.length; i++) if (S.players[i].id === id) return S.players[i].name;
-    return '玩家';
+    if (!S || !id) return T('common.player');
+    for (var i = 0; i < S.players.length; i++) if (S.players[i].id === id) return pname(S.players[i]);
+    return T('common.player');
   }
 
   function renderOnlineSummary() {
     if (!S || S.mode !== 'online' || !el.summaryPlayers || !el.summaryProgress) return;
-    el.summaryProgress.textContent = '配對 ' + (S.matchedCount / 2) + '／' + (S.layout.length / 2);
+    el.summaryProgress.textContent = T('game.progress', { a: S.matchedCount / 2, b: S.layout.length / 2 });
     var h = '';
     for (var i = 0; i < S.players.length; i++) {
       var p = S.players[i];
       var turn = S.phase === 'play' && S.players[S.cur] === p;
       h += '<div class="summary-player' + (turn ? ' turn' : '') + (p.id === S.meId ? ' me' : '') + '">';
-      h += '<span class="sp-avatar">' + p.avatar + '</span><span class="sp-name">' + esc(p.name) + '</span>';
-      h += '<span class="sp-turn">' + (turn ? '回合中' : '') + '</span><span class="sp-score">' + (S.scores[p.id] || 0) + '</span></div>';
+      h += '<span class="sp-avatar">' + p.avatar + '</span><span class="sp-name">' + esc(pname(p)) + '</span>';
+      h += '<span class="sp-turn">' + (turn ? T('game.turnTag') : '') + '</span><span class="sp-score">' + (S.scores[p.id] || 0) + '</span></div>';
     }
     el.summaryPlayers.innerHTML = h;
   }
 
-  function summaryEvent(msg) {
+  function renderFeed() {
+    if (!S || !el.summaryFeed) return;
+    el.summaryFeed.innerHTML = S.summaryFeed.map(function (item) { return '<p>' + esc(T(item.k, item.p)) + '</p>'; }).join('');
+  }
+  function summaryEvent(key, params) {
     if (!S || S.mode !== 'online' || !el.summaryFeed) return;
-    S.summaryFeed.unshift(String(msg));
+    S.summaryFeed.unshift({ k: key, p: params });
     S.summaryFeed = S.summaryFeed.slice(0, 6);
-    el.summaryFeed.innerHTML = S.summaryFeed.map(function (item) { return '<p>' + esc(item) + '</p>'; }).join('');
+    renderFeed();
   }
 
   function updateStat() {
     if (S.mode === 'solo') {
-      el.stat.textContent = '配對 ' + (S.matchedCount / 2) + '／' + (S.layout.length / 2) + '　翻牌 ' + S.moves + ' 次　' + fmt(S.elapsed());
+      el.stat.textContent = T('game.stat', { a: S.matchedCount / 2, b: S.layout.length / 2, moves: S.moves, time: fmt(S.elapsed()) });
     } else {
       var me = S.me();
-      el.stat.textContent = me && S.players[S.cur] === me ? '輪到你了！' : '對手回合…';
+      el.stat.textContent = T(me && S.players[S.cur] === me ? 'game.yourTurn' : 'game.oppTurn');
     }
     var hl = S.hints[S.meId] || 0;
     el.hintLeft.textContent = hl;
     var canHint = hl > 0 && S.phase === 'play' && !S.busy && S.open.length === 1 &&
       S.players[S.cur] && S.players[S.cur].id === S.meId;
     el.hintBtn.disabled = !canHint;
-    el.hintBtn.title = hl <= 0 ? '提示已用完' : (S.open.length === 1 ? '直接翻出配對的另一張' : '先翻開第一張牌才能使用提示');
+    el.hintBtn.title = T(hl <= 0 ? 'game.hintNone' : (S.open.length === 1 ? 'game.hintReady' : 'game.hintNeedFirst'));
   }
   function fmt(ms) { var s = Math.floor(ms / 1000); return (Math.floor(s / 60)) + ':' + ('0' + (s % 60)).slice(-2); }
 
   /* ---------------- 記憶時間 ---------------- */
   function beginMemory() {
     S.phase = 'memory';
-    summaryEvent('記憶時間開始，請記住牌面');
+    summaryEvent('game.ev.memory');
     for (var i = 0; i < S.cards.length; i++) S.cards[i].classList.add('open');
     if (S.ai) S.ai.observeAll(S.layout);
     var left = S.rule.memory;
     el.overlay.classList.add('on');
     el.overlay.classList.add('peek');
-    el.ovtxt.textContent = '記住牌面！';
+    S.ovKey = 'game.memorize';
+    el.ovtxt.textContent = T('game.memorize');
     el.ovnum.classList.remove('small');
     el.ovnum.textContent = left;
     w.Sound.play('tick');
@@ -175,7 +186,8 @@
         w.Sound.play('start');
         for (var j = 0; j < S.cards.length; j++) S.cards[j].classList.remove('open');
         el.overlay.classList.remove('peek');
-        el.ovtxt.textContent = '開始！';
+        S.ovKey = 'game.go';
+        el.ovtxt.textContent = T('game.go');
         el.ovnum.classList.add('small');
         el.ovnum.textContent = '🎴';
         setTimeout(function () {
@@ -200,7 +212,7 @@
       var ratio = left / total;
       el.fill.style.transform = 'scaleX(' + ratio + ')';
       var secs = Math.ceil(left / 1000);
-      el.tnum.textContent = secs + ' 秒';
+      el.tnum.textContent = T('game.secs', { n: secs });
       el.tbar.classList.toggle('warn', ratio <= 0.5 && ratio > 0.25);
       el.tbar.classList.toggle('danger', ratio <= 0.25);
       if (!S.busy && secs !== tickShown && secs <= 5 && secs > 0) {
@@ -224,9 +236,9 @@
     renderScores(); updateStat();
     if (S.mode !== 'solo') {
       var cp = S.players[S.cur];
-      if (cp.id === S.meId) { w.Sound.play('turn'); toast('輪到你了！'); }
-      else toast(cp.name + ' 的回合');
-      summaryEvent(cp.id === S.meId ? '輪到你，快翻兩張牌' : '輪到 ' + cp.name + ' 翻牌');
+      if (cp.id === S.meId) { w.Sound.play('turn'); toast(T('game.yourTurn')); }
+      else toast(T('game.turnOf', { name: pname(cp) }));
+      if (cp.id === S.meId) summaryEvent('game.ev.yourTurn'); else summaryEvent('game.ev.turnOf', { name: pname(cp) });
     }
     runTimer();
     if (S.mode === 'ai' && S.players[S.cur].type === 'ai') setTimeout(aiMove, S.ai.thinkTime());
@@ -240,10 +252,10 @@
     closeOpen();
     if (S.mode === 'solo') {
       S.timeouts++;
-      toast('⏰ 時間到！重新開始這一回合', 1600);
+      toast(T('game.timeoutSolo'), 1600);
       setTimeout(function () { if (S.phase !== 'over') beginTurn(); }, 900);
     } else if (S.mode === 'ai') {
-      toast('⏰ 時間到，換人！', 1600);
+      toast(T('game.timeoutNext'), 1600);
       nextPlayer();
       setTimeout(function () { if (S.phase !== 'over') beginTurn(); }, 900);
     }
@@ -341,7 +353,7 @@
     if (!S || S.phase !== 'play' || S.busy) return;
     if ((S.hints[S.meId] || 0) <= 0) return;
     if (!S.players[S.cur] || S.players[S.cur].id !== S.meId) return;
-    if (S.open.length !== 1) { toast('先翻開第一張牌，再按提示', 1600); return; }
+    if (S.open.length !== 1) { toast(T('game.needFirst'), 1600); return; }
     if (S.mode === 'online') { w.Net.hint(); return; }
 
     var first = S.open[0], sym = S.layout[first], target = -1;
@@ -418,21 +430,49 @@
     for (var i = 0; i < S.layout.length; i++) S.matched.push(false);
     S.players.forEach(function (p) { S.scores[p.id] = 0; S.hints[p.id] = S.rule.hints; });
 
-    el.mode.textContent = cfg.modeLabel || (cfg.mode === 'solo' ? '單機' : cfg.mode === 'ai' ? '對戰電腦' : '線上對戰');
-    el.diff.textContent = DIFF_NAME[S.size] + '（' + S.size + '×' + S.size + '）';
-    el.deckName.textContent = w.DECKS[S.deck].name;
+    S.modeLabel = cfg.modeLabel || null;
+    renderHeader();
     el.tbar.classList.remove('warn', 'danger');
     el.fill.style.transform = 'scaleX(1)';
-    el.tnum.textContent = S.rule.turn + ' 秒';
+    el.tnum.textContent = T('game.secs', { n: S.rule.turn });
     q('s-game').classList.toggle('online-mode', S.mode === 'online');
 
     buildBoard();
     renderScores();
-    summaryEvent('對戰開始，先記住所有牌面');
+    summaryEvent('game.ev.start');
     updateStat();
     el.board.onclick = cardClick;
     el.hintBtn.onclick = function () { w.Sound.play('click'); useHint(); };
     setTimeout(function () { resize(); beginMemory(); }, 120);
+  }
+
+  function renderHeader() {
+    if (!S) return;
+    el.mode.textContent = S.modeLabel || T(S.mode === 'solo' ? 'game.modeSolo' : S.mode === 'ai' ? 'game.modeAi' : 'game.modeOnline');
+    el.diff.textContent = T('rank.group', { diff: diffName(S.size), s: S.size });
+    el.deckName.textContent = deckLabel(S.deck);
+  }
+
+  /* 語言切換：只重繪文字，不動遊戲狀態 */
+  function relocalize() {
+    if (!S) return;
+    renderHeader();
+    renderScores();
+    renderFeed();
+    updateStat();
+    if (S.ovKey) el.ovtxt.textContent = T(S.ovKey);
+    if (S.phase !== 'play') el.tnum.textContent = T('game.secs', { n: S.rule.turn });
+    var i, labels = el.board.querySelectorAll('.card-label');
+    for (i = 0; i < labels.length; i++) {
+      var raw = labels[i].getAttribute('data-label') || '';
+      labels[i].textContent = T('card.' + raw, null, raw);
+    }
+    var marks = el.board.querySelectorAll('.card.matched .matchmark');
+    for (i = 0; i < marks.length; i++) {
+      var by = marks[i].getAttribute('data-by'), pl = null;
+      for (var k = 0; k < S.players.length; k++) if (S.players[k].id === by) pl = S.players[k];
+      marks[i].title = S.players.length > 1 && pl ? T('game.matchedBy', { name: pname(pl) }) : T('game.matched');
+    }
   }
 
   function stop() {
@@ -463,7 +503,7 @@
       w.Sound.play('flip');
       w.Sound.vibrate(8);
       if (S.open.length === 2) { S.busy = true; S.pausedAt = Date.now(); }
-      summaryEvent(playerName(byId || (S.players[S.cur] && S.players[S.cur].id)) + ' 翻開第 ' + (i + 1) + ' 張牌');
+      summaryEvent('game.ev.flip', { name: playerName(byId || (S.players[S.cur] && S.players[S.cur].id)), n: i + 1 });
       updateStat();
     },
     result: function (a, b, match, scores, byId) {
@@ -475,13 +515,13 @@
         markMatched(a, byId); markMatched(b, byId);
         w.Sound.play('match');
         w.Sound.vibrate([12, 35, 12]);
-        summaryEvent(playerName(byId) + ' 配對成功！');
+        summaryEvent('game.ev.match', { name: playerName(byId) });
       } else {
         S.cards[a].classList.add('wrong'); S.cards[b].classList.add('wrong');
         w.Sound.play('wrong');
         w.Sound.vibrate(35);
         (function (x, y) { setTimeout(function () { x.classList.remove('open', 'wrong'); y.classList.remove('open', 'wrong'); }, 220); })(S.cards[a], S.cards[b]);
-        summaryEvent(playerName(byId) + ' 配對失敗，換回合');
+        summaryEvent('game.ev.miss', { name: playerName(byId) });
       }
       S.open = [];
       renderScores(); updateStat();
@@ -497,15 +537,15 @@
       w.Sound.vibrate([30, 40, 30]);
       (closeArr || []).forEach(function (i) { S.cards[i].classList.remove('open'); });
       S.open = [];
-      toast('⏰ 時間到，換人！', 1500);
-      summaryEvent('回合時間到，換人');
+      toast(T('game.timeoutNext'), 1500);
+      summaryEvent('game.ev.timeout');
     },
-    hintUsed: function (byId, left) { hintUsed(byId, left); summaryEvent(playerName(byId) + ' 使用提示（剩 ' + left + ' 次）'); },
+    hintUsed: function (byId, left) { hintUsed(byId, left); summaryEvent('game.ev.hint', { name: playerName(byId), left: left }); },
     end: function (scores, winnerId) {
       if (!S) return;
       S.scores = scores;
       renderScores();
-      summaryEvent('對戰結束');
+      summaryEvent('game.ev.end');
       endGame(winnerId === undefined ? undefined : winnerId);
     },
     startMemory: function () { if (S) beginMemory(); }
@@ -533,5 +573,5 @@
   };
 
   w.Records = Records;
-  w.Game = { start: start, stop: stop, net: net, RULES: RULES, DIFF_NAME: DIFF_NAME, makeLayout: makeLayout, toast: toast, resize: resize, fmt: fmt };
+  w.Game = { relocalize: relocalize, start: start, stop: stop, net: net, RULES: RULES, DIFF_NAME: DIFF_NAME, makeLayout: makeLayout, toast: toast, resize: resize, fmt: fmt };
 })(window);

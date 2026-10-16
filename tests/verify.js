@@ -10,7 +10,7 @@ const read = (file) => fs.readFileSync(file, 'utf8');
 const html = read(path.join(publicDir, 'index.html'));
 const scriptSources = Array.from(html.matchAll(/<script src="([^"]+)"/g), (match) => match[1]);
 scriptSources.forEach((source) => {
-  assert.ok(fs.existsSync(path.join(publicDir, source)), `找不到 index.html 引用的程式：${source}`);
+  assert.ok(fs.existsSync(path.join(publicDir, source.split('?')[0])), `找不到 index.html 引用的程式：${source}`);
 });
 
 const sandbox = {
@@ -146,8 +146,8 @@ assert.ok(appSource.includes('readInviteRoom') && appSource.includes('function j
 assert.ok(appSource.includes('appendChat') && appSource.includes('navigator.share'), '用戶端必須同步顯示聊天室並支援分享連結');
 assert.ok(appSource.includes("var targetId = cur === 's-game' ? 'game-chatlog' : 'room-chatlog'") && appSource.includes('var host = q(targetId)'), '房間與對戰聊天室訊息不得互相混入');
 assert.ok(appSource.includes("markRow(q('ropt-first')") && appSource.includes("w.Net.setopt(room.size, room.deck, b.getAttribute('data-v'))"), '房主先手選項必須同步到伺服器');
-assert.ok(appSource.includes('開始遊戲 ▶') && appSource.includes('w.Net.start()') && appSource.includes('opponentReady') && appSource.includes('等待對手準備…'), '房主必須在對手 ready 後顯示開始遊戲');
-assert.ok(appSource.includes('對手離開了遊戲，對戰即將結束') && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
+assert.ok(appSource.includes("'room.start'") && appSource.includes('w.Net.start()') && appSource.includes('opponentReady') && appSource.includes("'room.waitReady'"), '房主必須在對手 ready 後顯示開始遊戲');
+assert.ok(appSource.includes("T('game.oppLeftToast')") && appSource.includes('renderRoom();'), '對手離開時必須提醒並自動結束對戰');
 assert.ok(appSource.includes("classList.toggle('chat-open')") && appSource.includes("setAttribute('aria-expanded'"), '聊天室必須點擊後才展開並同步可及性狀態');
 assert.ok(appSource.includes('setSettingsOpen') && appSource.includes('syncSettings') && appSource.includes('settings-music-volume'), '設定彈窗必須同步音訊狀態與音量');
 assert.ok(appSource.includes('history.pushState') && appSource.includes("e.key !== 'Tab'") && appSource.includes("setSettingsOpen(false, true)"), '設定彈窗必須支援返回鍵與鍵盤焦點循環');
@@ -192,7 +192,7 @@ assert.ok(styleSource.includes('@media (orientation:portrait) and (max-width:820
 assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-home.active{align-items:flex-start;'), '橫向窄高裝置必須避免主選單上下裁切');
 assert.ok(styleSource.includes('@media (max-width:1100px), (max-height:760px)') && styleSource.includes('.gbar{padding:4px 8px 0}') && styleSource.includes('.gamebody{gap:4px;padding:0 4px 2px}'), '小視窗必須壓縮外框留白並放大可操作棋盤');
 assert.ok(styleSource.includes('@media (orientation:landscape) and (max-height:520px)') && styleSource.includes('#s-game.active{overflow-y:auto;') && styleSource.includes('#s-game .boardwrap{flex:0 0 auto;') && styleSource.includes('touch-action:manipulation'), '橫向窄高遊戲必須保留可捲動的大棋盤與觸控操作區');
-assert.ok(styleSource.includes('.btn3d.settings-fab{top:calc(6px + env(safe-area-inset-top));right:calc(6px + env(safe-area-inset-right));') && styleSource.includes('.home-wrap .logo{width:calc(100% - 68px)}') && styleSource.includes('#s-game .gbar{padding-right:60px}') && styleSource.includes('.panel-head{padding-right:56px}'), '小視窗設定入口必須避開內容且保留主要寬度');
+assert.ok(styleSource.includes('.btn3d.settings-fab{top:calc(6px + env(safe-area-inset-top));right:calc(6px + env(safe-area-inset-right));') && styleSource.includes('.home-wrap .logo{width:calc(100% - 68px)}') && styleSource.includes('#s-game .gbar{padding-right:var(--fab-zone)}') && styleSource.includes('padding-right:max(0px,calc(var(--fab-zone)'), '小視窗設定入口必須避開內容且保留主要寬度');
 
 assert.ok(gameSource.includes('}, match ? 620 : 480);'), '單機配對失敗後必須在 480 毫秒內恢復操作');
 assert.ok(serverSource.includes('}, isMatch ? 650 : 500);'), '線上配對失敗後必須在 500 毫秒內切換回合');

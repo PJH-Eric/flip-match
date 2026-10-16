@@ -68,7 +68,7 @@ const server = http.createServer((req, res) => {
   const filePath = path.join(ROOT, path.normalize(urlPath).replace(/^([/\\])+/, ''));
   if (!filePath.startsWith(ROOT)) { res.writeHead(403); return res.end('Forbidden'); }
   fs.readFile(filePath, (err, data) => {
-    if (err) { res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }); return res.end('找不到檔案'); }
+    if (err) { res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }); return res.end('404 Not Found'); }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(data);
   });
@@ -358,7 +358,7 @@ function leaveRoom(cl, silent) {
       r.players.forEach(p => { p.ready = false; });
     } else {
       if (idx === 0) r.first = 'host';
-      bcast(r, { t: 'sys', m: cl.name + ' 離開了房間' });
+      bcast(r, { t: 'sys', code: 'left', name: cl.name, m: cl.name + ' 離開了房間' });
     }
     sendRoom(r);
   }
@@ -411,13 +411,13 @@ function handleClient(conn) {
       }
       case 'join': {
         const r = rooms.get(m.id);
-        if (!r) return conn.sendJSON({ t: 'err', m: '房間不存在' });
-        if (r.players.length >= 2) return conn.sendJSON({ t: 'err', m: '房間已滿' });
-        if (r.state === 'play') return conn.sendJSON({ t: 'err', m: '對戰進行中' });
+        if (!r) return conn.sendJSON({ t: 'err', code: 'roomNotFound', m: '房間不存在' });
+        if (r.players.length >= 2) return conn.sendJSON({ t: 'err', code: 'roomFull', m: '房間已滿' });
+        if (r.state === 'play') return conn.sendJSON({ t: 'err', code: 'roomPlaying', m: '對戰進行中' });
         if (cl.room) leaveRoom(cl, true);
         r.players.push(cl); cl.room = r; cl.ready = false;
         conn.sendJSON({ t: 'joined', id: r.id });
-        bcast(r, { t: 'sys', m: cl.name + ' 加入了房間' });
+        bcast(r, { t: 'sys', code: 'joined', name: cl.name, m: cl.name + ' 加入了房間' });
         sendRoom(r);
         broadcastRooms();
         break;

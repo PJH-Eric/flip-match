@@ -73,6 +73,12 @@
         bestRect = r;
       }
     });
+    // 語言切換鈕緊鄰設定鈕左側：徽章改以它為基準，往它的左邊或下方擺，不會壓住兩顆按鈕
+    const lang = document.querySelector('.lang-toggle');
+    if (best && lang && isShown(lang)) {
+      const lr = lang.getBoundingClientRect();
+      if (lr.top < 160 && lr.right <= bestRect.right + 1) { best = lang; bestRect = lr; }
+    }
     return best ? { el: best, rect: bestRect } : null;
   }
 
@@ -200,8 +206,9 @@
     const quality = ms === null ? 'unknown' : ms <= 30 ? 'good' : ms < 100 ? 'warn' : 'bad';
     el.classList.add('is-' + quality);
     el.querySelector('.latency-meter__value').textContent = ms === null ? '--' : String(ms);
-    el.setAttribute('aria-label', ms === null ? '連線延遲，等待回應' : '連線延遲 ' + ms + ' 毫秒');
-    el.title = ms === null ? '連線延遲：等待回應' : '連線延遲：' + ms + ' ms';
+    const tr = (key, params, fallback) => (window.I18N ? window.I18N.t(key, params, fallback) : fallback);
+    el.setAttribute('aria-label', ms === null ? tr('latency.waiting', null, '連線延遲，等待回應') : tr('latency.ms', { ms: ms }, '連線延遲 ' + ms + ' 毫秒'));
+    el.title = ms === null ? tr('latency.titleWaiting', null, '連線延遲：等待回應') : tr('latency.title', { ms: ms }, '連線延遲：' + ms + ' ms');
     dock();
   }
 
@@ -260,6 +267,8 @@
   }
 
   root.addEventListener('resize', function () { dock(true); });
+
+  if (root.I18N && root.I18N.onChange) root.I18N.onChange(function () { render(); });
 
   root.NetworkLatency = { setActive, setProbe, report, bindSocketIo };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensureMeter, { once: true });
