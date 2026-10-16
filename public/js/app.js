@@ -224,6 +224,7 @@
   }
 
   function startLocal() {
+    GameAnalytics.start({ mode: 'solo', difficulty: String(opt.size), players: 1 });
     var meId = 'me';
     var players = [{ id: 'me', name: T('common.you'), nameKey: 'common.you', avatar: AVATARS[0], type: 'me' }];
     lastCfg = { mode: 'solo', size: opt.size, deck: opt.deck, players: players, meId: meId };
@@ -265,6 +266,7 @@
     q('res-stats').innerHTML = rows;
   }
   function showResult(res) {
+    GameAnalytics.end({ result: res.mode === 'solo' ? 'complete' : (res.draw ? 'draw' : (res.win ? 'win' : 'lose')) });
     lastRes = res;
     renderResult();
     setTimeout(function () { go('s-result'); }, 900);
@@ -575,6 +577,7 @@
     w.Net.on('chat', appendChat);
 
     w.Net.on('start', function (m) {
+      GameAnalytics.start({ mode: 'online', difficulty: String(m.size), players: m.players.length });
       var players = m.players.map(function (p, i) {
         return { id: p.id, name: p.name, avatar: AVATARS[i], type: p.id === w.Net.id() ? 'me' : 'remote' };
       });

@@ -51,12 +51,18 @@
         return;
       }
       if (m.t === 'welcome') { myId = m.id; if (m.name) myName = m.name; }
+      if (w.GameAnalytics) w.GameAnalytics.roomResponse(m.t, !!m.room);
       emit(m.t, m);
     };
   }
   function disconnect() { wantOpen = false; clearTimeout(retryTimer); if (ws) { try { ws.close(); } catch (e) {} } ws = null; connected = false; }
 
-  function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
+  function send(o) {
+    if (ws && ws.readyState === 1) {
+      ws.send(JSON.stringify(o));
+      if (w.GameAnalytics) w.GameAnalytics.roomRequest(o);
+    }
+  }
 
   function setName(n) {
     myName = String(n || '玩家').slice(0, 12) || '玩家';
