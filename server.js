@@ -47,23 +47,6 @@ const MIME = {
 const server = http.createServer((req, res) => {
   setCorsHeaders(req, res);
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
-  if (urlPath === '/api/presence') {
-    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-    if (req.method !== 'GET') { res.writeHead(405, { 'Content-Type': 'application/json; charset=utf-8' }); return res.end(JSON.stringify({ error: 'Method Not Allowed' })); }
-    pruneEmptyRooms();
-    const activeRooms = [...rooms.values()].filter((room) => room.state !== 'dead' && room.players.length > 0).length;
-    const payload = {
-      gameId: 'flip-match',
-      online: clients.size,
-      players: [...clients.values()].filter((client) => client.room).length,
-      spectators: 0,
-      lobby: [...clients.values()].filter((client) => !client.room).length,
-      rooms: activeRooms,
-      updatedAt: new Date().toISOString()
-    };
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-    return res.end(JSON.stringify(payload));
-  }
   if (urlPath === '/') urlPath = '/index.html';
   const filePath = path.join(ROOT, path.normalize(urlPath).replace(/^([/\\])+/, ''));
   if (!filePath.startsWith(ROOT)) { res.writeHead(403); return res.end('Forbidden'); }
