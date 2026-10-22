@@ -6,5 +6,8 @@
   "lobbyUrl": "https://pjh-eric.github.io/game-lobby/",
   "googleSiteVerification": "",
   "genre": "翻牌記憶",
-  "players": "1-2"
+  "players": "1-2",
+  "iconUrl": "https://pjh-eric.github.io/flip-match/favicon-96.png",
+  "ogImage": "https://pjh-eric.github.io/flip-match/og-image.png",
+  "ogImageAlt": "翻牌配對碰遊戲圖示"
 }
