@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node tests/localization.js && node tests/verify.js",
-    "test:localization": "node tests/localization.js"
+    "test": "node tests/analytics.js && node tests/localization.js && node tests/verify.js",
+    "test:localization": "node tests/localization.js",
+    "test:analytics": "node tests/analytics.js"
   },
   "engines": {
     "node": ">=16"
