@@ -1,0 +1,32 @@
+{
+  "zh-Hant": {
+    "name": "翻牌配對碰",
+    "summary": "翻開兩張牌找出一樣的圖案，記住位置就能連續拿分。",
+    "modes": [
+      "單機挑戰",
+      "電腦對戰",
+      "線上房間"
+    ],
+    "controls": "點擊卡牌翻面，找出相同圖案"
+  },
+  "zh-Hans": {
+    "name": "翻牌配对碰",
+    "summary": "翻开两张牌找出一样的图案，记住位置就能连续拿分。",
+    "modes": [
+      "单机挑战",
+      "电脑对战",
+      "线上房间"
+    ],
+    "controls": "点击卡牌翻面，找出相同图案"
+  },
+  "en": {
+    "name": "Flip Match",
+    "summary": "Flip two cards to find a matching pair. Remember where they are to keep scoring.",
+    "modes": [
+      "Solo Challenge",
+      "vs Computer",
+      "Online Room"
+    ],
+    "controls": "Tap a card to flip it and find matching pictures"
+  }
+}
