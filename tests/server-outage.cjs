@@ -85,3 +85,20 @@ assert.match(html, /js\/server-outage\.js/);
 assert.match(html, /css\/server-outage\.css/);
 assert.ok(!/\b(?:alert|confirm|prompt)\s*\(/.test(fs.readFileSync(path.join(__dirname, '../public/js/server-outage.js'), 'utf8')), 'No browser-native alerts');
 console.log('Server outage: timing, recovery, cancellation, deduplication, focus, translations and 12 month boundaries passed');
+
+const states = [], sockets = [];
+const onlineWindow = { ServerOutage: { state(value) { states.push(value); } } };
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../public/js/online.js'), 'utf8'), {
+  window: onlineWindow, location: { protocol: 'http:', host: 'localhost' },
+  WebSocket: function () { this.readyState = 0; this.send = function () {}; sockets.push(this); }
+});
+onlineWindow.Net.connect();
+const connectingCount = states.length;
+onlineWindow.Net.connect();
+assert.equal(states.length, connectingCount, 'Repeated connect while pending must not start another notice');
+sockets[0].readyState = 1;
+sockets[0].onopen();
+const connectedCount = states.length;
+onlineWindow.Net.connect();
+assert.equal(states.length, connectedCount, 'Refreshing an already connected lobby must not start an outage timer');
+console.log('Flip Match: pending and connected reconnect requests do not arm a false outage');

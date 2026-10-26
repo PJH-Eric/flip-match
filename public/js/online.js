@@ -7,7 +7,9 @@
 
   function on(evt, fn) { (handlers[evt] = handlers[evt] || []).push(fn); }
   function emit(evt, a, b) {
-    if (evt === 'status' && wantOpen && w.ServerOutage) w.ServerOutage.state(a === 'ok' ? 'open' : 'connecting'); (handlers[evt] || []).forEach(function (f) { try { f(a, b); } catch (e) { console.error(e); } }); }
+    if (evt === 'status' && wantOpen && w.ServerOutage) w.ServerOutage.state(a === 'ok' ? 'open' : 'connecting');
+    (handlers[evt] || []).forEach(function (f) { try { f(a, b); } catch (e) { console.error(e); } });
+  }
 
   function url() {
     // config.js 有指定伺服器（例如部署在 Render）就連過去，否則連同一台主機
@@ -22,8 +24,8 @@
 
   function connect() {
     wantOpen = true;
-    if (w.ServerOutage) w.ServerOutage.state('begin');
     if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+    if (w.ServerOutage) w.ServerOutage.state('begin');
     try { ws = new WebSocket(url()); } catch (e) { emit('status', 'bad'); return; }
     emit('status', 'connecting');
     ws.onopen = function () {
@@ -57,7 +59,14 @@
       emit(m.t, m);
     };
   }
-  function disconnect() { if (w.ServerOutage) w.ServerOutage.state('idle'); wantOpen = false; clearTimeout(retryTimer); if (ws) { try { ws.close(); } catch (e) {} } ws = null; connected = false; }
+  function disconnect() {
+    if (w.ServerOutage) w.ServerOutage.state('idle');
+    wantOpen = false;
+    clearTimeout(retryTimer);
+    if (ws) { try { ws.close(); } catch (e) {} }
+    ws = null;
+    connected = false;
+  }
 
   function send(o) {
     if (ws && ws.readyState === 1) {
