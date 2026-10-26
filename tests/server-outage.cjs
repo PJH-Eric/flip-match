@@ -46,6 +46,10 @@ const local = setup();
 assert.equal(local.timers.size, 0, 'Homepage/offline starts no timer or network work');
 local.api.state('offline'); local.api.state('unset');
 assert.equal(local.timers.size, 0, 'Configuration errors and initial offline do not show reset advice');
+local.api.state('connecting'); local.tick(31000);
+assert.equal(local.document.body.children.length, 1, 'Network retries outside a lobby/room never show a notice');
+local.api.state('idle');
+local.api.setScreen('lobby');
 local.api.state('connecting');
 local.tick(20000);
 assert.equal(local.document.body.children.length, 1, 'Allow a 20 second cold start');
@@ -102,3 +106,30 @@ const connectedCount = states.length;
 onlineWindow.Net.connect();
 assert.equal(states.length, connectedCount, 'Refreshing an already connected lobby must not start an outage timer');
 console.log('Flip Match: pending and connected reconnect requests do not arm a false outage');
+
+const scoped = setup();
+scoped.api.setScreen('lobby'); scoped.api.state('connecting'); scoped.tick(20000);
+scoped.api.setScreen('game'); scoped.tick(60000);
+assert.equal(scoped.document.body.children.length, 1, 'Starting a game cancels the pending notice');
+for (const screen of ['game', 'play', 's-game', 's-watch', 'result', 'home', 'setup']) {
+  scoped.api.setScreen(screen);
+  for (const status of ['begin', 'connecting', 'loading', 'waking', 'retrying', 'reconnecting', 'error', 'offline', 'failed', 'closed']) scoped.api.state(status);
+  scoped.tick(60000);
+  assert.equal(scoped.timers.size, 0, 'No notice timer on ' + screen);
+  assert.equal(scoped.document.body.children.length, 1, 'No modal on ' + screen);
+}
+scoped.api.setScreen('room'); scoped.tick(29999);
+assert.equal(scoped.document.body.children.length, 1, 'Returning to a room starts a fresh 30 second wait');
+scoped.tick(1);
+assert.equal(scoped.document.body.children.length, 2, 'A disconnected waiting room can show the notice');
+scoped.api.setScreen('game');
+assert.equal(scoped.document.body.children.length, 1, 'Starting a game closes an already open notice');
+assert.equal(scoped.original.inert, false, 'Starting a game restores background interaction');
+scoped.api.state('open'); scoped.api.setScreen('lobby'); scoped.tick(60000);
+assert.equal(scoped.document.body.children.length, 1, 'A healthy lobby has no notice');
+console.log('Server outage screen scope: lobby/room only, gameplay/spectating suppressed, pending and open notices cleared');
+
+const cancelled = setup();
+cancelled.api.setScreen('lobby'); cancelled.api.state('begin'); cancelled.api.state('idle');
+cancelled.api.state('error'); cancelled.tick(60000);
+assert.equal(cancelled.document.body.children.length, 1, 'Late failure callbacks after disconnect cannot revive a notice');
