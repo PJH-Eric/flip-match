@@ -131,6 +131,7 @@
 
   /* ---------- 畫面切換 ---------- */
   function go(id) {
+    if (id === 's-home' || id === 's-setup') w.Net.disconnect();
     if (w.ServerOutage) w.ServerOutage.setScreen(id);
     if (cur === 's-game' && id !== 's-game') w.Game.stop();
     if (id !== 's-game' && w.NetworkLatency) w.NetworkLatency.setActive(false);
