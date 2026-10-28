@@ -141,6 +141,7 @@ body{
 
 /* ---------- 大廳 ---------- */
 .lobby-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.online-count{max-width:100%;padding:5px 12px;border:2px solid var(--ink);border-radius:999px;background:var(--cream);font-size:.9rem;font-weight:800;white-space:normal}
 .nick{display:flex;align-items:center;gap:8px;font-weight:700}
 .nick input{font:inherit;font-weight:700;border:3px solid var(--ink);border-radius:14px;padding:10px 14px;width:160px;background:#fff;color:var(--ink);outline:none}
 .conn{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--ink-soft);min-width:96px;justify-content:flex-end}

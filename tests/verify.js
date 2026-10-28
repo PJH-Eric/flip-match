@@ -140,6 +140,7 @@ const appSource = read(path.join(publicDir, 'js', 'app.js'));
 const audioSource = read(path.join(publicDir, 'js', 'audio.js'));
 const joinHandler = appSource.slice(appSource.indexOf('host.onclick'), appSource.indexOf('function renderRoom()'));
 const serverSource = read(path.join(root, 'server.js'));
+assert.ok((serverSource.match(/online: clients\.size/g) || []).length >= 2, '大廳推播與手動重新整理都必須帶在線人數');
 assert.ok(joinHandler.includes('w.Net.setName(nick);'), '加入房間前必須先同步暱稱');
 assert.ok(appSource.includes("'flags'"), '前端牌組選單必須包含各國國旗');
 assert.ok(serverSource.includes("'flags'"), '伺服器必須允許各國國旗牌組');

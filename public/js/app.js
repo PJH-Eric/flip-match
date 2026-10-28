@@ -299,7 +299,16 @@
   /* ---------- 大廳 ---------- */
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  var lobbyOnlineCount = null;
+  function paintOnlineCount() {
+    var el = q('online-count');
+    var valid = Number.isInteger(lobbyOnlineCount);
+    el.hidden = !valid;
+    el.textContent = valid ? T('lobby.onlineCount', { n: lobbyOnlineCount }) : '';
+  }
+
   function renderRooms(list) {
+    paintOnlineCount();
     var host = q('roomlist');
     lastRooms = list;
     if (!list || !list.length) { host.innerHTML = '<div class="empty">' + T('lobby.empty') + '</div>'; return; }
@@ -548,10 +557,15 @@
     w.Net.on('status', function (s) {
       var d = q('conn-dot');
       connState = s;
+      if (s !== 'ok') lobbyOnlineCount = null;
+      paintOnlineCount();
       d.className = 'conn' + (s === 'ok' ? ' ok' : s === 'bad' ? ' bad' : '');
       renderConn();
     });
-    w.Net.on('rooms', function (m) { if (cur === 's-lobby') renderRooms(m.rooms); });
+    w.Net.on('rooms', function (m) {
+      lobbyOnlineCount = Number.isInteger(m.online) && m.online >= 0 ? m.online : null;
+      if (cur === 's-lobby') renderRooms(m.rooms);
+    });
     w.Net.on('joined', function () {
       inviteRoomId = '';
       q('invite-join').hidden = true;

@@ -194,7 +194,7 @@ function broadcastRooms() {
   pruneEmptyRooms();
   for (const r of rooms.values()) if (r.state !== 'dead' && r.players.length > 0) list.push(roomBrief(r));
   list.sort((a, b) => (a.state === 'wait' ? -1 : 1) - (b.state === 'wait' ? -1 : 1));
-  const msg = JSON.stringify({ t: 'rooms', rooms: list });
+  const msg = JSON.stringify({ t: 'rooms', rooms: list, online: clients.size });
   for (const c of clients.values()) if (!c.room) c.conn.sendText(msg);
 }
 function sendRoom(r) {
@@ -372,7 +372,7 @@ function handleClient(conn) {
         pruneEmptyRooms();
         const list = [];
         for (const r of rooms.values()) if (r.state !== 'dead' && r.players.length > 0) list.push(roomBrief(r));
-        conn.sendJSON({ t: 'rooms', rooms: list });
+        conn.sendJSON({ t: 'rooms', rooms: list, online: clients.size });
         break;
       }
       case 'create': {

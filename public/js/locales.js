@@ -97,6 +97,7 @@
     'deck.sports': '運動',
 
     'lobby.title': '線上大廳',
+    'lobby.onlineCount': '目前在線：{n} 人',
     'lobby.connecting': '連線中…',
     'lobby.connected': '已連線',
     'lobby.disconnected': '連線中斷',
@@ -319,6 +320,7 @@
     'deck.sports': 'Sports',
 
     'lobby.title': 'Online Lobby',
+    'lobby.onlineCount': 'Online now: {n}',
     'lobby.connecting': 'Connecting…',
     'lobby.connected': 'Connected',
     'lobby.disconnected': 'Disconnected',
@@ -547,6 +549,7 @@
     "deck.phonetics": "注音符号",
     "deck.sports": "运动",
     "lobby.title": "线上大厅",
+    "lobby.onlineCount": "目前在线：{n} 人",
     "lobby.connecting": "连线中…",
     "lobby.connected": "已连线",
     "lobby.disconnected": "连线中断",
