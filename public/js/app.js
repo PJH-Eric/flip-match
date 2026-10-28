@@ -40,7 +40,7 @@
     q('conn-txt').textContent = T(k);
   }
 
-  var DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics', 'sports'];
+  var DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics', 'sports', 'mixed'];
   var AVATARS = ['🐱', '🐻', '🐰', '🐼', '🦊', '🐧'];
 
   var opt = { size: 4, deck: 'animals' };

@@ -84,6 +84,7 @@
     'setup.rule.8': '記憶 30 秒 · 提示 3 次',
     'setup.start': '開始遊戲 ▶',
 
+    'deck.mixed': '混合',
     'deck.animals': '動物',
     'deck.vehicles': '交通工具',
     'deck.fruits': '蔬果',
@@ -305,6 +306,7 @@
     'setup.rule.8': 'Memorize 30s · 3 hints',
     'setup.start': 'Start ▶',
 
+    'deck.mixed': 'Mixed',
     'deck.animals': 'Animals',
     'deck.vehicles': 'Vehicles',
     'deck.fruits': 'Fruit & Veg',
@@ -533,6 +535,7 @@
     "setup.rule.6": "记忆 20 秒 · 提示 2 次",
     "setup.rule.8": "记忆 30 秒 · 提示 3 次",
     "setup.start": "开始游戏 ▶",
+    "deck.mixed": "混合",
     "deck.animals": "动物",
     "deck.vehicles": "交通工具",
     "deck.fruits": "蔬果",

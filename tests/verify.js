@@ -102,7 +102,24 @@ const realisticAsset = (deckId, iconId) => {
   assert.strictEqual(realisticAsset(deckId, iconId), expected, `${deckId}/${iconId} 的百科圖示對應錯誤`);
 });
 
+vm.runInContext(read(path.join(publicDir, 'js', 'decks', 'mixed.js')), sandbox, { filename: 'mixed.js' });
+const mixedIcons = sandbox.DECKS.mixed.icons;
+const allIcons = deckFiles.flatMap((id) => Array.from(sandbox.DECKS[id].icons));
+assert.strictEqual(mixedIcons.length, 324, '混合牌組數量必須與伺服器一致');
+assert.strictEqual(new Set(mixedIcons.map((icon) => icon.svg)).size, mixedIcons.length, '混合牌組不可包含重複圖案');
+assert.ok(allIcons.every((icon) => mixedIcons.some((mixed) => mixed.svg === icon.svg)), '混合牌組必須涵蓋所有種類的圖案');
+assert.ok(scriptSources.indexOf('js/decks/mixed.js') > scriptSources.indexOf('js/decks/realistic.js'), '混合牌組必須在圖案替換之後載入');
+
 vm.runInContext(read(path.join(publicDir, 'js', 'game.js')), sandbox, { filename: 'game.js' });
+[4, 6, 8].forEach((size) => {
+  const layout = sandbox.Game.makeLayout(size, 'mixed');
+  const symbols = Array.from(new Set(layout));
+  assert.strictEqual(symbols.length, size * size / 2);
+  symbols.forEach((symbol) => {
+    assert.ok(symbol >= 0 && symbol < mixedIcons.length);
+    assert.strictEqual(layout.filter((value) => value === symbol).length, 2);
+  });
+});
 [
   [4, 8],
   [6, 18],
@@ -165,7 +182,7 @@ assert.ok(styleSource.includes('.deck-row{display:grid;grid-template-columns:rep
 assert.ok(styleSource.includes('@media (max-width:560px){') && styleSource.includes('.deck-row{grid-template-columns:repeat(2,minmax(0,1fr))}'), '窄版牌組選擇必須改為兩欄以維持觸控尺寸');
 assert.ok(gameSource.includes('renderOnlineSummary') && gameSource.includes('summaryEvent'), '線上對戰必須即時更新摘要與行動紀錄');
 assert.ok(gameSource.includes('var iconCount = deck && deck.icons ? deck.icons.length : 32;'), '遊戲版面必須依牌組圖示數量產生配對');
-assert.ok(serverSource.includes('const DECK_ICON_COUNTS = { phonetics: 37 };') && serverSource.includes('const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;'), '線上伺服器必須支援 37 個注音符號牌面');
+assert.ok(serverSource.includes('const DECK_ICON_COUNTS = { phonetics: 37, mixed: 324 };') && serverSource.includes('const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;'), '線上伺服器必須支援注音及混合牌組');
 assert.ok(gameSource.includes("classList.toggle('online-mode'"), '線上對戰必須顯示摘要與聊天室側欄');
 assert.ok(gameSource.includes('cardFront(ic)') && gameSource.includes('class="card-label"'), '翻開牌面時必須顯示中文名稱');
 assert.ok(gameSource.includes('w.Sound.vibrate'), '翻牌、配對與逾時必須可觸發觸控震動');

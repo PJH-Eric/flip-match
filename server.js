@@ -157,10 +157,10 @@ const RULES = {
   6: { memory: 20, turn: 20, hints: 2 },
   8: { memory: 30, turn: 30, hints: 3 }
 };
-const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics', 'sports'];
+const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics', 'sports', 'mixed'];
 const SEQ_DECKS = ['numbers'];
 const ICONS_PER_DECK = 32;
-const DECK_ICON_COUNTS = { phonetics: 37 };
+const DECK_ICON_COUNTS = { phonetics: 37, mixed: 324 };
 
 const clients = new Map();   // id -> client
 const rooms = new Map();     // id -> room
