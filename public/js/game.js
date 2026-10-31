@@ -13,13 +13,13 @@
 
   var S = null;
   var el = {};
-  var timerRAF = null, tickShown = -1, memInt = null;
+  var timerRAF = null, tickShown = -1, memInt = null, memoryLeft = 0;
 
   function q(id) { return document.getElementById(id); }
   function cache() {
     el.board = q('board'); el.wrap = document.querySelector('.boardwrap');
     el.scorebar = q('scorebar'); el.fill = q('timer-fill'); el.tnum = q('timer-num');
-    el.tbar = document.querySelector('.timerbar'); el.overlay = q('overlay');
+    el.tbar = q('timerbar'); el.tlabel = q('timer-label'); el.overlay = q('overlay');
     el.ovtxt = q('ov-txt'); el.ovnum = q('ov-num'); el.toast = q('toast');
     el.hintBtn = q('b-hint'); el.hintLeft = q('hint-left'); el.stat = q('statline');
     el.mode = q('g-mode'); el.diff = q('g-diff'); el.deckName = q('g-deck');
@@ -162,30 +162,43 @@
   function fmt(ms) { var s = Math.floor(ms / 1000); return (Math.floor(s / 60)) + ':' + ('0' + (s % 60)).slice(-2); }
 
   /* ---------------- 記憶時間 ---------------- */
+  function updateCountdown(labelKey, seconds, ratio, total) {
+    var label = T(labelKey), value = T('game.secs', { n: seconds });
+    var maxValue = String(total), secondsValue = String(seconds);
+    if (el.tlabel.textContent !== label) el.tlabel.textContent = label;
+    if (el.tnum.textContent !== value) el.tnum.textContent = value;
+    el.fill.style.transform = 'scaleX(' + ratio + ')';
+    if (el.tbar.getAttribute('aria-label') !== label) el.tbar.setAttribute('aria-label', label);
+    if (el.tbar.getAttribute('aria-valuemax') !== maxValue) el.tbar.setAttribute('aria-valuemax', maxValue);
+    if (el.tbar.getAttribute('aria-valuenow') !== secondsValue) el.tbar.setAttribute('aria-valuenow', secondsValue);
+    if (el.tbar.getAttribute('aria-valuetext') !== value) el.tbar.setAttribute('aria-valuetext', value);
+    el.tbar.classList.toggle('warn', ratio <= 0.5 && ratio > 0.25);
+    el.tbar.classList.toggle('danger', ratio <= 0.25);
+  }
+
   function beginMemory() {
     S.phase = 'memory';
     summaryEvent('game.ev.memory');
     for (var i = 0; i < S.cards.length; i++) S.cards[i].classList.add('open');
     if (S.ai) S.ai.observeAll(S.layout);
-    var left = S.rule.memory;
-    el.overlay.classList.add('on');
-    el.overlay.classList.add('peek');
-    S.ovKey = 'game.memorize';
-    el.ovtxt.textContent = T('game.memorize');
-    el.ovnum.classList.remove('small');
-    el.ovnum.textContent = left;
+    memoryLeft = S.rule.memory;
+    el.overlay.classList.remove('on');
+    S.ovKey = null;
+    el.tbar.classList.add('active', 'memory');
+    updateCountdown('game.memorize', memoryLeft, 1, S.rule.memory);
     w.Sound.play('tick');
     memInt = setInterval(function () {
-      left--;
-      if (left > 0) {
-        el.ovnum.textContent = left;
-        w.Sound.play(left <= 3 ? 'tickHot' : 'tick');
+      memoryLeft--;
+      if (memoryLeft > 0) {
+        updateCountdown('game.memorize', memoryLeft, memoryLeft / S.rule.memory, S.rule.memory);
+        w.Sound.play(memoryLeft <= 3 ? 'tickHot' : 'tick');
       } else {
         clearInterval(memInt); memInt = null;
-        el.ovnum.textContent = '0';
+        updateCountdown('game.memorize', 0, 0, S.rule.memory);
+        el.tbar.classList.remove('active', 'memory', 'warn', 'danger');
         w.Sound.play('start');
         for (var j = 0; j < S.cards.length; j++) S.cards[j].classList.remove('open');
-        el.overlay.classList.remove('peek');
+        el.overlay.classList.add('on');
         S.ovKey = 'game.go';
         el.ovtxt.textContent = T('game.go');
         el.ovnum.classList.add('small');
@@ -205,16 +218,15 @@
     stopTimer();
     tickShown = -1;
     var total = S.rule.turn * 1000;
+    el.tbar.classList.add('active');
+    el.tbar.classList.remove('memory');
     function frame() {
       if (!S || S.phase !== 'play') return;
       var used = S.busy ? (S.pausedAt - S.turnStart) : (Date.now() - S.turnStart);
       var left = Math.max(0, total - used);
       var ratio = left / total;
-      el.fill.style.transform = 'scaleX(' + ratio + ')';
       var secs = Math.ceil(left / 1000);
-      el.tnum.textContent = T('game.secs', { n: secs });
-      el.tbar.classList.toggle('warn', ratio <= 0.5 && ratio > 0.25);
-      el.tbar.classList.toggle('danger', ratio <= 0.25);
+      updateCountdown('game.turnCountdown', secs, ratio, S.rule.turn);
       if (!S.busy && secs !== tickShown && secs <= 5 && secs > 0) {
         tickShown = secs;
         w.Sound.play(secs <= 3 ? 'tickHot' : 'tick');
@@ -385,6 +397,7 @@
   function endGame(winnerIdFromNet) {
     S.phase = 'over';
     stopTimer();
+    el.tbar.classList.remove('active', 'memory', 'warn', 'danger');
     if (memInt) { clearInterval(memInt); memInt = null; }
     var total = Date.now() - (S.playStart || Date.now());
     var res = { mode: S.mode, size: S.size, deck: S.deck, ms: total, moves: S.moves, timeouts: S.timeouts, scores: S.scores, players: S.players };
@@ -432,9 +445,10 @@
 
     S.modeLabel = cfg.modeLabel || null;
     renderHeader();
-    el.tbar.classList.remove('warn', 'danger');
+    el.tbar.classList.remove('active', 'memory', 'warn', 'danger');
     el.fill.style.transform = 'scaleX(1)';
     el.tnum.textContent = T('game.secs', { n: S.rule.turn });
+    memoryLeft = 0;
     q('s-game').classList.toggle('online-mode', S.mode === 'online');
 
     buildBoard();
@@ -461,7 +475,13 @@
     renderFeed();
     updateStat();
     if (S.ovKey) el.ovtxt.textContent = T(S.ovKey);
-    if (S.phase !== 'play') el.tnum.textContent = T('game.secs', { n: S.rule.turn });
+    if (S.phase === 'memory') updateCountdown('game.memorize', memoryLeft, memoryLeft / S.rule.memory, S.rule.memory);
+    else if (S.phase === 'play') {
+      var total = S.rule.turn * 1000;
+      var used = S.busy ? (S.pausedAt - S.turnStart) : (Date.now() - S.turnStart);
+      var left = Math.max(0, total - used);
+      updateCountdown('game.turnCountdown', Math.ceil(left / 1000), left / total, S.rule.turn);
+    }
     var i, labels = el.board.querySelectorAll('.card-label');
     for (i = 0; i < labels.length; i++) {
       var raw = labels[i].getAttribute('data-label') || '';
@@ -478,7 +498,8 @@
   function stop() {
     stopTimer();
     if (memInt) { clearInterval(memInt); memInt = null; }
-    if (el.overlay) el.overlay.classList.remove('on', 'peek');
+    if (el.tbar) el.tbar.classList.remove('active', 'memory', 'warn', 'danger');
+    if (el.overlay) el.overlay.classList.remove('on');
     if (q('s-game')) q('s-game').classList.remove('online-mode', 'chat-open');
     var chatToggle = q('b-gamechat'), chatbox = q('game-chatbox');
     if (chatToggle) chatToggle.setAttribute('aria-expanded', 'false');
