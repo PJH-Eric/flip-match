@@ -431,3 +431,12 @@ input,textarea,select{user-select:text;-webkit-user-select:text}
 
 /* 對戰畫面的聊天室在矮畫面會把輸入列頂出去，鍵盤打開時縮一點 */
 body.kb-open .game-chat{height:min(clamp(180px,42%,280px),calc(var(--app-h,100dvh) - 120px))}
+
+/* ---------- 大廳聊天室：套用翻牌配對碰配色 ---------- */
+body .lc-root{
+  --lc-accent:var(--pink-d);--lc-accent-ink:#fff;
+  --lc-panel-bg:var(--paper);--lc-panel-solid:var(--paper);
+  --lc-ink:var(--ink);--lc-muted:var(--ink-soft);--lc-line:var(--cream-d);
+  --lc-field-bg:#fff;--lc-sys-bg:var(--cream);--lc-name:#C2637C;
+  --lc-radius:var(--radius);--lc-z:60;
+}

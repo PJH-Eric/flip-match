@@ -349,6 +349,9 @@ function leaveRoom(cl, silent) {
   broadcastRooms();
 }
 
+/* 大廳聊天室（與房間聊天分開；最近 50 則只存在記憶體） */
+const lobbyChat = require('./lib/lobby-chat.js').createHub({ send: (id, msg) => { const c = clients.get(id); if (c) c.conn.sendJSON(msg); }, key: 't' });
+
 function handleClient(conn) {
   const cl = { id: uid('p'), name: '玩家', conn: conn, room: null, ready: false };
   clients.set(cl.id, cl);
@@ -390,8 +393,10 @@ function handleClient(conn) {
         conn.sendJSON({ t: 'joined', id: r.id });
         sendRoom(r);
         broadcastRooms();
+        lobbyChat.roomOpened({ code: r.id, roomName: r.name, host: cl.name });
         break;
       }
+      case 'lobbychat': lobbyChat.handle(cl.id, m); break;
       case 'join': {
         const r = rooms.get(m.id);
         if (!r) return conn.sendJSON({ t: 'err', code: 'roomNotFound', m: '房間不存在' });
@@ -444,6 +449,7 @@ function handleClient(conn) {
   });
 
   conn.on('close', () => {
+    lobbyChat.drop(cl.id);
     leaveRoom(cl, true);
     clients.delete(cl.id);
     broadcastRooms();

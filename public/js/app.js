@@ -496,6 +496,29 @@
       applyMotion();
       syncSettings();
     };
+    /* 大廳聊天室（左下氣泡）：跟房間聊天分開 */
+    var lobbyChat = w.LobbyChat ? w.LobbyChat.create({
+      game: 'flip-match',
+      mount: '#app',
+      watch: '#s-lobby',
+      getName: function () { return (q('nickname').value || '').trim() || w.Net.savedName(); },
+      setName: function (n) { q('nickname').value = n.slice(0, 12); w.Net.setName(n.slice(0, 12)); },
+      join: function (name) { w.Net.send({ t: 'lobbychat', op: 'join', name: name }); },
+      leave: function () { w.Net.send({ t: 'lobbychat', op: 'leave' }); },
+      send: function (text, name) { w.Net.send({ t: 'lobbychat', op: 'send', text: text, name: name }); },
+      joinRoom: function (code) { w.Sound.play('click'); w.Net.join(code); }
+    }) : null;
+    if (lobbyChat) {
+      lobbyChat.bindSetting({ input: '#settings-lobbychat', label: '#settings-lobbychat-label', sub: '#settings-lobbychat-sub', reset: '#settings-reset' });
+      lobbyChat.setConnected(w.Net.isOpen());
+      w.Net.on('status', function (s) { lobbyChat.setConnected(s === 'ok'); });
+      w.Net.on('lobbychat', function (m) {
+        if (m.op === 'history') lobbyChat.history(m.history, m.online);
+        else if (m.op === 'msg') lobbyChat.add(m.msg);
+        else if (m.op === 'online') lobbyChat.online(m.online);
+        else if (m.op === 'error') lobbyChat.error(m.code);
+      });
+    }
     q('settings-reset').onclick = function () {
       w.Sound.play('click');
       if (!w.Sound.isMusicOn()) w.Sound.toggleMusic();
