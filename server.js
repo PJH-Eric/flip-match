@@ -349,7 +349,7 @@ function leaveRoom(cl, silent) {
   broadcastRooms();
 }
 
-/* 大廳聊天室（與房間聊天分開；最近 50 則只存在記憶體） */
+/* 大廳聊天室（與房間聊天分開；即時傳送訊息，不載入歷史訊息） */
 const lobbyChat = require('./lib/lobby-chat.js').createHub({ send: (id, msg) => { const c = clients.get(id); if (c) c.conn.sendJSON(msg); }, key: 't' });
 
 function handleClient(conn) {
