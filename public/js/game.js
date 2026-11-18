@@ -61,6 +61,26 @@
     el.board.style.setProperty('--bs', bs + 'px');
     el.board.style.setProperty('--cols', S.size);
     el.board.style.setProperty('--gap', GAPS[S.size] + 'px');
+    scheduleFit();
+  }
+  /* 牌面名稱自動縮小到放得下；縮到 6px 仍放不下就隱藏（圖案本身可辨識），不再用省略號截字 */
+  var fitRaf = 0;
+  function scheduleFit() {
+    if (fitRaf) return;
+    fitRaf = requestAnimationFrame(function () { fitRaf = 0; fitLabels(); });
+  }
+  function fitLabels() {
+    if (!S || !el.board) return;
+    var labels = el.board.querySelectorAll('.card-label');
+    var i, l;
+    for (i = 0; i < labels.length; i++) { labels[i].style.fontSize = ''; labels[i].style.visibility = ''; }
+    for (i = 0; i < labels.length; i++) {
+      l = labels[i];
+      if (!l.clientWidth) continue;
+      var fs = parseFloat(getComputedStyle(l).fontSize) || 10;
+      while (l.scrollWidth > l.clientWidth + 0.5 && fs > 6) { fs -= 0.5; l.style.fontSize = fs + 'px'; }
+      if (l.scrollWidth > l.clientWidth + 0.5) l.style.visibility = 'hidden';
+    }
   }
   w.addEventListener('resize', resize);
   w.addEventListener('orientationchange', function () { setTimeout(resize, 200); });
@@ -469,6 +489,7 @@
       var raw = labels[i].getAttribute('data-label') || '';
       labels[i].textContent = T('card.' + raw, null, raw);
     }
+    scheduleFit();
     var marks = el.board.querySelectorAll('.card.matched .matchmark');
     for (i = 0; i < marks.length; i++) {
       var by = marks[i].getAttribute('data-by'), pl = null;

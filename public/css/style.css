@@ -592,3 +592,6 @@ body:has(.settings-modal.open) .language-controls,body:has(.settings-modal.open)
 
 /* v2g（loop 3）：線上對戰的延遲指示在右上角按鈕左側，頂列文字要多避開它 */
 @media (max-width:560px){#s-game.online-mode .gbar{padding-right:calc(var(--fab-zone) + 50px)}}
+
+/* v2h（第二輪 loop 1）：自訂房名可換行、完整顯示 */
+#room-title{white-space:normal;overflow-wrap:anywhere;text-overflow:clip;line-height:1.2}
