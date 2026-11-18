@@ -440,3 +440,155 @@ body .lc-root{
   --lc-field-bg:#fff;--lc-sys-bg:var(--cream);--lc-name:#C2637C;
   --lc-radius:var(--radius);--lc-z:60;
 }
+
+/* ================================================================
+ * v2：全裝置 RWD／文字不斷行／不破版／自繪捲軸
+ * ================================================================ */
+/* 自繪捲軸（粉色膠囊） */
+*{scrollbar-width:thin;scrollbar-color:var(--pink-d) transparent}
+*::-webkit-scrollbar{width:12px;height:12px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:var(--pink-d);border:3px solid transparent;background-clip:padding-box;border-radius:999px}
+*::-webkit-scrollbar-thumb:hover{background:var(--ink-soft);background-clip:padding-box}
+*::-webkit-scrollbar-corner{background:transparent}
+
+/* 按鈕文字永不斷行；放不下時由容器換行／縮小 */
+.btn3d .b3-lbl,.btn3d>span,.optcard b,.optcard .s,.rtag,.conn,.online-count,.lbl,.pcard .ps{white-space:nowrap}
+.panel-head{flex-wrap:wrap;row-gap:6px}
+.panel-head h2{white-space:nowrap;font-size:clamp(1.05rem,4.8vw,1.5rem)}
+#room-title{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.home-row{flex-wrap:wrap}
+.home-row .btn3d{flex:1 1 auto}
+.lobby-bar>.btn3d{flex:1 1 auto}
+#invite-join{align-items:center}
+#invite-join-note{flex:1 1 220px}
+#invite-join .btn3d{flex:1 1 auto}
+.roomrow{flex-wrap:wrap;row-gap:8px}
+.roomrow .rname{flex:1 1 9em;min-width:0}
+.roomrow .btn3d{margin-left:auto;flex:0 0 auto}
+.seat{min-width:0;flex:1 1 0}
+.panel.result{margin-top:max(8vh,68px)}
+.panel.result h2{white-space:nowrap;font-size:clamp(1rem,5.4vw,1.7rem)}
+.resstats .row{gap:10px}
+.resstats .row>span{min-width:0}
+.resstats .row>b{white-space:nowrap}
+.rankgrp .r>b{white-space:nowrap}
+.pcard{flex:0 1 auto;min-width:0;max-width:100%}
+.pcard .pn{flex:0 1 auto;min-width:0}
+.gbar{padding-right:calc(var(--fab-zone) + 8px)}
+#s-game .gbar{padding-right:var(--fab-zone)}
+.scorebar{padding-right:calc(var(--fab-zone) + 8px)}
+#s-game .scorebar{padding-right:var(--fab-zone)}
+.gfoot{flex-wrap:wrap;row-gap:2px}
+.statline{white-space:nowrap;font-size:clamp(.66rem,3.2vw,.9rem);flex:1 1 auto}
+.toast{max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis}
+.lc-iconbtn{width:40px!important;height:40px!important;padding:9px!important}
+
+/* 牌面名稱：隨卡片寬度縮放，過小就不顯示（圖案本身已可辨識） */
+.card{container-type:inline-size}
+.board .card .card-label{padding:1px .3em 2px;border-width:1.5px;letter-spacing:0;border-radius:8px;font-size:clamp(6.2px,calc(13.5cqw - 1.2px),10.5px)}
+@container (max-width:40px){.card-label{display:none}}
+
+/* 記憶倒數提示：固定在頂列（離開鍵與右上角按鈕之間），不再蓋住玩家分數與牌面 */
+.overlay.peek{inset:calc(2px + env(safe-area-inset-top)) calc(var(--fab-zone) + 6px) auto 96px;height:58px;align-items:center;justify-content:center}
+.overlay.peek .ovbox{margin:0;max-width:100%;padding:4px 18px 5px;border-width:3px;border-radius:20px;display:flex;align-items:center;gap:10px;animation:none;box-shadow:0 5px 0 rgba(91,70,54,.22)}
+.overlay.peek .ovtxt{font-size:clamp(.62rem,2.6vw,1.05rem);white-space:nowrap;letter-spacing:.04em;flex:0 0 auto}
+.overlay.peek .ovnum{font-size:clamp(1.3rem,5vw,2.2rem);line-height:1;flex:0 0 auto}
+#s-game:has(.overlay.peek.on) .gmeta{visibility:hidden}
+@media (max-width:420px){
+  .overlay.peek{inset:calc(2px + env(safe-area-inset-top)) calc(var(--fab-zone) + 4px) auto 90px}
+  .overlay.peek .ovbox{flex-direction:column;gap:0;padding:3px 10px 4px;border-radius:16px}
+  .overlay.peek .ovtxt{font-size:clamp(.56rem,3vw,.78rem)}
+  .overlay.peek .ovnum{font-size:1.35rem}
+}
+
+/* 說明表格：窄螢幕改成可橫向捲動，文字一律不斷行 */
+@media (max-width:560px){
+  .panel-head .spacer{display:none}
+  .panel-head h2{font-size:clamp(1rem,5vw,1.25rem)}
+  .conn{min-width:0;font-size:.74rem}
+  .roomrow .rname{flex-basis:100%}
+  .htable{display:block;overflow-x:auto;table-layout:auto;font-size:.78rem}
+  .htable th,.htable td{white-space:nowrap;padding:6px 10px;word-break:normal}
+  .home-row .btn3d{padding-left:14px;padding-right:14px}
+}
+@media (max-width:400px){
+  .seats{gap:4px}
+  .seat{padding:8px 6px}
+  .seat .ava{font-size:1.9rem}
+  .vs{font-size:1rem}
+  .btn3d{padding-left:16px;padding-right:16px}
+  .btn3d.small{padding-left:11px;padding-right:11px}
+}
+
+/* 對戰資訊欄：寬螢幕／矮橫向 → 左側直欄（戰況＋聊天室），棋盤佔其餘空間且不被遮住 */
+@media (min-width:821px), (orientation:landscape) and (max-height:520px){
+  #s-game.online-mode .gamebody{flex-direction:row;align-items:stretch}
+  #s-game.online-mode .online-tools{position:static;order:-1;display:flex;flex-direction:column;flex:0 0 clamp(210px,28vw,300px);min-width:0;width:auto;height:auto;gap:8px;padding:4px 0 4px 4px;overflow-y:auto;overflow-x:hidden;pointer-events:auto}
+  #s-game.online-mode.chat-open .online-tools{flex-basis:clamp(210px,28vw,300px)}
+  #s-game.online-mode .summary-card{position:static;width:auto;max-height:none;flex:0 0 auto}
+  #s-game.online-mode.chat-open .game-chat{position:static;display:flex;width:auto;height:auto;flex:1 1 200px;min-height:170px;bottom:auto}
+  #s-game.online-mode .boardwrap{transform:none;flex:1 1 0;min-width:0;width:auto;height:auto}
+}
+/* 直向（手機／平板）：戰況在上、聊天室展開時左右並排，不橫向溢出 */
+@media (orientation:portrait) and (max-width:820px){
+  #s-game.online-mode .online-tools,#s-game.online-mode.chat-open .online-tools{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;flex:0 0 auto;width:100%;height:auto;overflow:visible}
+  #s-game.online-mode.chat-open .online-tools{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:stretch}
+  #s-game.online-mode .summary-card{position:static;width:auto;min-width:0;max-height:none}
+  #s-game.online-mode .game-chat{position:static;width:auto;min-width:0;height:min(260px,40vh)}
+}
+body .lc-root .lc-me{max-width:54%}
+/* 設定視窗開啟時，右上角固定按鈕（z-index 極高的語言鈕）會蓋住視窗的關閉鈕，開啟期間先隱藏 */
+body:has(.settings-modal.open) .language-controls,body:has(.settings-modal.open) .lang-toggle,body:has(.settings-modal.open) #b-settings,body:has(.settings-modal.open) #network-latency{visibility:hidden}
+
+/* v2b */
+@media (max-width:560px){:root{--fab-zone:120px}}
+.seat b{white-space:normal;overflow-wrap:anywhere;line-height:1.2;font-size:clamp(.82rem,3.6vw,1.05rem)}
+.setting-range{flex-wrap:wrap;row-gap:6px}
+.setting-range>span{white-space:nowrap}
+.setting-range input{flex:1 1 140px;width:auto;min-width:120px}
+@media (max-width:340px){.overlay.peek .ovtxt{display:none}}
+@media (max-width:420px){.overlay.peek .ovtxt{font-size:clamp(.64rem,3vw,.78rem)}}
+
+/* v2c：頂列資訊分段換行（不用省略號截掉）、矮橫向展開聊天室時精簡戰況 */
+@media (max-width:560px){
+  .gmeta{display:flex;flex-wrap:wrap;justify-content:center;column-gap:6px;line-height:1.15;overflow:visible;white-space:normal;text-overflow:clip;font-size:clamp(.7rem,3.2vw,.8rem)}
+  .gmeta>span{white-space:nowrap}
+  .gmeta .dot{margin:0}
+}
+@media (max-width:420px){.gmeta .dot{display:none}}
+@media (orientation:landscape) and (max-height:520px){
+  #s-game.online-mode.chat-open .summary-feed{display:none}
+  #s-game.online-mode.chat-open .summary-players{padding:6px 0 2px}
+  #s-game.online-mode .summary-card{padding:8px}
+}
+
+.pcard .pn{max-width:12em}
+
+/* v2d */
+.summary-head b,.summary-head span{white-space:nowrap}
+.summary-head{flex-wrap:wrap;row-gap:2px}
+#s-lobby .panel{margin-bottom:96px}
+@media (orientation:portrait) and (max-width:420px){
+  #s-game.online-mode.chat-open .online-tools{grid-template-columns:minmax(0,1fr)}
+  #s-game.online-mode.chat-open .summary-feed{display:none}
+  #s-game.online-mode .game-chat{height:min(230px,36vh)}
+}
+@media (orientation:landscape) and (max-height:520px){
+  .overlay.peek{height:40px;top:1px}
+  .overlay.peek .ovbox{padding:1px 14px 2px;border-radius:16px}
+  .overlay.peek .ovtxt{font-size:.8rem}
+  .overlay.peek .ovnum{font-size:1.4rem}
+}
+
+/* v2e（loop 1）：英文名稱較長，8×8 窄卡片不顯示名稱（圖案本身可辨識）；窄螢幕玩家卡縮小 */
+@container (max-width:58px){html[lang="en"] .card-label{display:none}}
+@media (max-width:360px){.pcard .pn{font-size:.8rem}.pcard{padding:5px 9px;gap:5px}.pcard .pav{font-size:1.2rem}}
+@media (max-height:520px){.summary-player{font-size:.74rem}.summary-player .sp-turn{font-size:.64rem}}
+
+/* v2f（loop 2） */
+@media (max-width:360px){:root{--fab-zone:110px}}
+@media (max-height:520px){.summary-player .sp-turn{font-size:.68rem}}
+
+/* v2g（loop 3）：線上對戰的延遲指示在右上角按鈕左側，頂列文字要多避開它 */
+@media (max-width:560px){#s-game.online-mode .gbar{padding-right:calc(var(--fab-zone) + 50px)}}

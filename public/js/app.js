@@ -441,6 +441,12 @@
       var open = q('s-game').classList.toggle('chat-open');
       this.setAttribute('aria-expanded', open ? 'true' : 'false');
       q('game-chatbox').setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open) {
+        // 直向窄螢幕聊天室在棋盤下方，展開後自動捲到看得見的位置
+        setTimeout(function () {
+          try { q('game-chatbox').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+        }, 60);
+      }
     };
     q('b-settings').onclick = function () {
       w.Sound.play('click');

@@ -54,7 +54,9 @@
   /* ---------------- 版面 ---------------- */
   function resize() {
     if (!S) return;
-    var w2 = el.wrap.clientWidth, h2 = el.wrap.clientHeight;
+    var cs = getComputedStyle(el.wrap);
+    var w2 = el.wrap.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+    var h2 = el.wrap.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
     var bs = Math.floor(Math.max(120, Math.min(w2, h2)));
     el.board.style.setProperty('--bs', bs + 'px');
     el.board.style.setProperty('--cols', S.size);
