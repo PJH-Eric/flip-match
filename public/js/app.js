@@ -46,7 +46,7 @@
   var opt = { size: 4, deck: 'animals' };
   try {
     var saved = JSON.parse(localStorage.getItem('fm_opt') || '{}');
-    if ([4, 6, 8].indexOf(saved.size) >= 0) opt.size = saved.size;
+    if ([4, 5, 6, 7, 8].indexOf(saved.size) >= 0) opt.size = saved.size;
     if (DECK_IDS.indexOf(saved.deck) >= 0) opt.deck = saved.deck;
   } catch (e) {}
   function saveOpt() { try { localStorage.setItem('fm_opt', JSON.stringify(opt)); } catch (e) {} }
@@ -281,9 +281,9 @@
   function renderRank() {
     var db = w.Records.all();
     var h = '';
-    [4, 6, 8].forEach(function (s) {
+    [4, 5, 6, 7, 8].forEach(function (s) {
       var r = db['s' + s];
-      h += '<div class="rankgrp"><h4>' + T('rank.group', { diff: diffName(s), s: s }) + '</h4>';
+      h += '<div class="rankgrp"><h4>' + T('rank.group', { diff: diffName(s), s: s, dim: w.Game.dimText(s) }) + '</h4>';
       if (!r) h += '<div class="r"><span>' + T('rank.none') + '</span><b>—</b></div>';
       else {
         h += '<div class="r"><span>' + T('rank.best') + '</span><b>' + T('res.points', { n: r.score || 0 }) + '</b></div>';
@@ -317,7 +317,7 @@
       var playing = r.state === 'play';
       h += '<div class="roomrow' + (playing ? ' playing' : '') + '">' +
         '<span class="rname">' + esc(roomLabel(r.name)) + '</span>' +
-        '<span class="rtag">' + diffName(r.size) + ' ' + r.size + '×' + r.size + '</span>' +
+        '<span class="rtag">' + diffName(r.size) + ' ' + w.Game.dimText(r.size) + '</span>' +
         '<span class="rtag">' + esc(deckName(r.deck)) + '</span>' +
         '<span class="rtag">' + r.count + '/2</span>' +
         (playing || r.count >= 2

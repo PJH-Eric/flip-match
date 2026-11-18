@@ -73,9 +73,16 @@
 
       <h3 class="lbl" data-i18n="setup.pickDiff">選擇難度</h3>
       <div class="opt-row" id="opt-size">
-        <button class="optcard" data-v="4"><b data-i18n="diff.4">簡單</b><span class="s">4 × 4</span><span class="t" data-i18n="setup.rule.4">記憶 10 秒 · 提示 1 次</span></button>
-        <button class="optcard" data-v="6"><b data-i18n="diff.6">普通</b><span class="s">6 × 6</span><span class="t" data-i18n="setup.rule.6">記憶 20 秒 · 提示 2 次</span></button>
-        <button class="optcard" data-v="8"><b data-i18n="diff.8">困難</b><span class="s">8 × 8</span><span class="t" data-i18n="setup.rule.8">記憶 30 秒 · 提示 3 次</span></button>
+        <button class="optcard" data-v="4"><b data-i18n="diff.4">新手</b><span class="s">4 × 4</span><span class="t" data-i18n="setup.rule.4">記憶 10 秒
+提示 1 次</span></button>
+        <button class="optcard" data-v="5"><b data-i18n="diff.5">簡單</b><span class="s">4 × 6</span><span class="t" data-i18n="setup.rule.5">記憶 15 秒
+提示 1 次</span></button>
+        <button class="optcard" data-v="6"><b data-i18n="diff.6">普通</b><span class="s">6 × 6</span><span class="t" data-i18n="setup.rule.6">記憶 20 秒
+提示 2 次</span></button>
+        <button class="optcard" data-v="7"><b data-i18n="diff.7">困難</b><span class="s">6 × 8</span><span class="t" data-i18n="setup.rule.7">記憶 25 秒
+提示 2 次</span></button>
+        <button class="optcard" data-v="8"><b data-i18n="diff.8">專家</b><span class="s">6 × 10</span><span class="t" data-i18n="setup.rule.8">記憶 30 秒
+提示 3 次</span></button>
       </div>
 
       <h3 class="lbl" data-i18n="setup.pickDeck">選擇牌組</h3>
@@ -132,9 +139,11 @@
       <div id="host-opts">
         <h3 class="lbl" data-i18n="room.hostSetDiff">難度（房主設定）</h3>
         <div class="opt-row" id="ropt-size">
-          <button class="optcard" data-v="4"><b data-i18n="diff.4">簡單</b><span class="s">4 × 4</span></button>
+          <button class="optcard" data-v="4"><b data-i18n="diff.4">新手</b><span class="s">4 × 4</span></button>
+          <button class="optcard" data-v="5"><b data-i18n="diff.5">簡單</b><span class="s">4 × 6</span></button>
           <button class="optcard" data-v="6"><b data-i18n="diff.6">普通</b><span class="s">6 × 6</span></button>
-          <button class="optcard" data-v="8"><b data-i18n="diff.8">困難</b><span class="s">8 × 8</span></button>
+          <button class="optcard" data-v="7"><b data-i18n="diff.7">困難</b><span class="s">6 × 8</span></button>
+          <button class="optcard" data-v="8"><b data-i18n="diff.8">專家</b><span class="s">6 × 10</span></button>
         </div>
         <h3 class="lbl" data-i18n="room.hostSetDeck">牌組（房主設定）</h3>
         <div class="opt-row deck-row" id="ropt-deck"></div>
@@ -163,7 +172,7 @@
   <section class="screen" id="s-game">
     <header class="gbar">
       <button class="btn3d small" data-color="cream" id="b-quit"><span data-i18n="game.quit">◀ 離開</span></button>
-      <div class="gmeta"><span id="g-mode" data-i18n="game.modeSolo">單機</span><span class="dot">·</span><span id="g-diff" data-i18n="diff.4">簡單</span><span class="dot">·</span><span id="g-deck">動物</span></div>
+      <div class="gmeta"><span id="g-mode" data-i18n="game.modeSolo">單機</span><span class="dot">·</span><span id="g-diff" data-i18n="diff.4">新手</span><span class="dot">·</span><span id="g-deck">動物</span></div>
     </header>
 
     <div class="scorebar" id="scorebar"></div>
@@ -237,12 +246,14 @@
       <div class="helpbody">
         <h3 data-i18n="help.h.how">怎麼玩？</h3>
         <p data-i18n-html="help.how">開場會先掀開全部的牌讓你<b>記住位置</b>，時間到就全部蓋起來。接著每次翻兩張，圖案一樣就<b>配對成功、得 1 分，那兩張會一直保持翻開不再蓋回去</b>，而且可以繼續翻；翻錯才換對手。把全部的牌配完就結束。</p>
-        <h3 data-i18n="help.h.levels">三種難度</h3>
+        <h3 data-i18n="help.h.levels">五種難度</h3>
         <table class="htable">
           <tr><th data-i18n="help.th.diff">難度</th><th data-i18n="help.th.cards">牌數</th><th data-i18n="help.th.memory">記憶時間</th><th data-i18n="help.th.turn">每回合限時</th><th data-i18n="help.th.hint">提示</th></tr>
-          <tr><td data-i18n="diff.4">簡單</td><td>4 × 4</td><td data-i18n="help.sec10">10 秒</td><td data-i18n="help.sec10">10 秒</td><td data-i18n="help.hint1">1 次</td></tr>
+          <tr><td data-i18n="diff.4">新手</td><td>4 × 4</td><td data-i18n="help.sec10">10 秒</td><td data-i18n="help.sec10">10 秒</td><td data-i18n="help.hint1">1 次</td></tr>
+          <tr><td data-i18n="diff.5">簡單</td><td>4 × 6</td><td data-i18n="help.sec15">15 秒</td><td data-i18n="help.sec15">15 秒</td><td data-i18n="help.hint1">1 次</td></tr>
           <tr><td data-i18n="diff.6">普通</td><td>6 × 6</td><td data-i18n="help.sec20">20 秒</td><td data-i18n="help.sec20">20 秒</td><td data-i18n="help.hint2">2 次</td></tr>
-          <tr><td data-i18n="diff.8">困難</td><td>8 × 8</td><td data-i18n="help.sec30">30 秒</td><td data-i18n="help.sec30">30 秒</td><td data-i18n="help.hint3">3 次</td></tr>
+          <tr><td data-i18n="diff.7">困難</td><td>6 × 8</td><td data-i18n="help.sec25">25 秒</td><td data-i18n="help.sec25">25 秒</td><td data-i18n="help.hint2">2 次</td></tr>
+          <tr><td data-i18n="diff.8">專家</td><td>6 × 10</td><td data-i18n="help.sec30">30 秒</td><td data-i18n="help.sec30">30 秒</td><td data-i18n="help.hint3">3 次</td></tr>
         </table>
         <h3 data-i18n="help.h.turn">回合限時</h3>
         <p data-i18n-html="help.turn">輪到你之後會開始倒數，最後 3 秒會有<b>滴答提醒音</b>。時間到還沒翻完兩張，這一回合就結束換人（單機模式則是扣分並重新開始回合）。</p>

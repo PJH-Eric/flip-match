@@ -111,10 +111,10 @@ assert.ok(allIcons.every((icon) => mixedIcons.some((mixed) => mixed.svg === icon
 assert.ok(scriptSources.indexOf('js/decks/mixed.js') > scriptSources.indexOf('js/decks/realistic.js'), '混合牌組必須在圖案替換之後載入');
 
 vm.runInContext(read(path.join(publicDir, 'js', 'game.js')), sandbox, { filename: 'game.js' });
-[4, 6, 8].forEach((size) => {
+[4, 5, 6, 7, 8].forEach((size) => {
   const layout = sandbox.Game.makeLayout(size, 'mixed');
   const symbols = Array.from(new Set(layout));
-  assert.strictEqual(symbols.length, size * size / 2);
+  assert.strictEqual(symbols.length, ({ 4: 8, 5: 12, 6: 18, 7: 24, 8: 30 })[size]);
   symbols.forEach((symbol) => {
     assert.ok(symbol >= 0 && symbol < mixedIcons.length);
     assert.strictEqual(layout.filter((value) => value === symbol).length, 2);
@@ -122,8 +122,10 @@ vm.runInContext(read(path.join(publicDir, 'js', 'game.js')), sandbox, { filename
 });
 [
   [4, 8],
+  [5, 12],
   [6, 18],
-  [8, 32]
+  [7, 24],
+  [8, 30]
 ].forEach(([size, pairs]) => {
   const layout = sandbox.Game.makeLayout(size, 'numbers');
   const symbols = Array.from(new Set(layout)).sort((a, b) => a - b);
@@ -133,6 +135,9 @@ vm.runInContext(read(path.join(publicDir, 'js', 'game.js')), sandbox, { filename
   });
 });
 
+const gameSource = read(path.join(publicDir, 'js', 'game.js'));
+assert.ok(/S\.mode !== 'online' && w2 > h2/.test(gameSource), '線上對戰盤面必須固定行列，不可依裝置方向對調');
+assert.deepStrictEqual(Array.from({ length: 5 }, (_, i) => sandbox.Game.dimText(i + 4)), ['4×4', '4×6', '6×6', '6×8', '6×10']);
 assert.ok(!html.includes('id="b-ai"'), '首頁不應再顯示電腦對戰');
 assert.ok(!html.includes('id="opt-ai"'), '設定畫面不應再顯示電腦強度');
 
@@ -177,7 +182,6 @@ assert.ok(onlineSource.includes('chat: function'), 'WebSocket 用戶端必須提
 assert.ok(onlineSource.includes('setopt: function (size, deck, first)'), 'WebSocket 用戶端必須傳送先手設定');
 assert.ok(onlineSource.includes('start: function'), 'WebSocket 用戶端必須提供房主開始遊戲方法');
 
-const gameSource = read(path.join(publicDir, 'js', 'game.js'));
 const styleSource = read(path.join(publicDir, 'css', 'style.css'));
 assert.ok(styleSource.includes('.deck-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))'), '牌組選擇必須在寬版分成上下各五張');
 assert.ok(styleSource.includes('@media (max-width:560px){') && styleSource.includes('.deck-row{grid-template-columns:repeat(2,minmax(0,1fr))}'), '窄版牌組選擇必須改為兩欄以維持觸控尺寸');

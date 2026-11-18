@@ -2,14 +2,21 @@
 (function (w) {
   'use strict';
 
-  var RULES = { 4: { memory: 10, turn: 10, hints: 1 }, 6: { memory: 20, turn: 20, hints: 2 }, 8: { memory: 30, turn: 30, hints: 3 } };
-  var DIFF_FALLBACK = { 4: '簡單', 6: '普通', 8: '困難' };
+  var RULES = { 4: { memory: 10, turn: 10, hints: 1 }, 5: { memory: 15, turn: 15, hints: 1 }, 6: { memory: 20, turn: 20, hints: 2 }, 7: { memory: 25, turn: 25, hints: 2 }, 8: { memory: 30, turn: 30, hints: 3 } };
+  var DIFF_FALLBACK = { 4: '新手', 5: '簡單', 6: '普通', 7: '困難', 8: '專家' };
   function T(k, p, f) { return w.I18N ? w.I18N.t(k, p, f) : (f !== undefined ? f : k); }
   function diffName(size) { return T('diff.' + size, null, DIFF_FALLBACK[size]); }
-  var DIFF_NAME = { get 4() { return diffName(4); }, get 6() { return diffName(6); }, get 8() { return diffName(8); } };
+  var DIFF_NAME = { get 4() { return diffName(4); }, get 5() { return diffName(5); }, get 7() { return diffName(7); }, get 6() { return diffName(6); }, get 8() { return diffName(8); } };
   function deckLabel(id) { var d = w.DECKS[id]; return T('deck.' + id, null, d ? d.name : id); }
   function pname(p) { return p.nameKey ? T(p.nameKey) : p.name; }
-  var GAPS = { 4: 12, 6: 9, 8: 6 };
+  var GAPS = { 4: 10, 5: 8, 6: 7, 7: 6, 8: 5 };
+  /* 5 種棋盤：4×4、4×6、6×6、6×8、6×10（代號 4..8）；非正方形時直向為「窄欄 × 多列」，橫向對調 */
+  var DIMS = { 4: [4, 4], 5: [4, 6], 6: [6, 6], 7: [6, 8], 8: [6, 10] };
+  function dims(size, landscape) {
+    var d = DIMS[size] || [4, 4];
+    return landscape ? { cols: d[1], rows: d[0] } : { cols: d[0], rows: d[1] };
+  }
+  function dimText(size) { var d = dims(size, false); return d.cols + '×' + d.rows; }
 
   var S = null;
   var el = {};
@@ -32,7 +39,7 @@
 
   var SEQ_DECKS = ['numbers'];
   function makeLayout(size, deckId) {
-    var pairs = size * size / 2;
+    var d = dims(size, false), pairs = d.cols * d.rows / 2;
     var deck = w.DECKS && w.DECKS[deckId];
     var iconCount = deck && deck.icons ? deck.icons.length : 32;
     var picks;
@@ -57,13 +64,20 @@
     var cs = getComputedStyle(el.wrap);
     var w2 = el.wrap.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
     var h2 = el.wrap.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
-    var bs = Math.floor(Math.max(120, Math.min(w2, h2)));
-    el.board.style.setProperty('--bs', bs + 'px');
-    el.board.style.setProperty('--cols', S.size);
-    el.board.style.setProperty('--gap', GAPS[S.size] + 'px');
+    /* 線上對戰各裝置的盤面必須一致，固定採直向格局；只有單機才依螢幕方向對調行列 */
+    var d = dims(S.size, S.mode !== 'online' && w2 > h2 * 1.05);
+    var gap = GAPS[S.size];
+    var cell = Math.floor(Math.max(20, Math.min((w2 - gap * (d.cols - 1)) / d.cols, (h2 - gap * (d.rows - 1)) / d.rows)));
+    var bw = cell * d.cols + gap * (d.cols - 1);
+    var bh = cell * d.rows + gap * (d.rows - 1);
+    el.board.style.setProperty('--bs', bw + 'px');
+    el.board.style.setProperty('--bh', bh + 'px');
+    el.board.style.setProperty('--cols', d.cols);
+    el.board.style.setProperty('--rows', d.rows);
+    el.board.style.setProperty('--gap', gap + 'px');
     scheduleFit();
   }
-  /* 牌面名稱自動縮小到放得下；縮到 6px 仍放不下就隱藏（圖案本身可辨識），不再用省略號截字 */
+  /* 牌面名稱自動縮小到放得下；縮到 8px 仍放不下就隱藏（圖案本身可辨識），不再用省略號截字 */
   var fitRaf = 0;
   function scheduleFit() {
     if (fitRaf) return;
@@ -78,7 +92,7 @@
       l = labels[i];
       if (!l.clientWidth) continue;
       var fs = parseFloat(getComputedStyle(l).fontSize) || 10;
-      while (l.scrollWidth > l.clientWidth + 0.5 && fs > 6) { fs -= 0.5; l.style.fontSize = fs + 'px'; }
+      while (l.scrollWidth > l.clientWidth + 0.5 && fs > 8) { fs -= 0.5; l.style.fontSize = fs + 'px'; }
       if (l.scrollWidth > l.clientWidth + 0.5) l.style.visibility = 'hidden';
     }
   }
@@ -471,7 +485,7 @@
   function renderHeader() {
     if (!S) return;
     el.mode.textContent = S.modeLabel || T(S.mode === 'solo' ? 'game.modeSolo' : S.mode === 'ai' ? 'game.modeAi' : 'game.modeOnline');
-    el.diff.textContent = T('rank.group', { diff: diffName(S.size), s: S.size });
+    el.diff.textContent = T('rank.group', { diff: diffName(S.size), s: S.size, dim: dimText(S.size) });
     el.deckName.textContent = deckLabel(S.deck);
   }
 
@@ -596,5 +610,5 @@
   };
 
   w.Records = Records;
-  w.Game = { relocalize: relocalize, start: start, stop: stop, net: net, RULES: RULES, DIFF_NAME: DIFF_NAME, makeLayout: makeLayout, toast: toast, resize: resize, fmt: fmt };
+  w.Game = { dimText: dimText, relocalize: relocalize, start: start, stop: stop, net: net, RULES: RULES, DIFF_NAME: DIFF_NAME, makeLayout: makeLayout, toast: toast, resize: resize, fmt: fmt };
 })(window);

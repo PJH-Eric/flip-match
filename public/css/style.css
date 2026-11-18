@@ -207,8 +207,8 @@ body{
 
 .gamebody{position:relative;display:flex;flex:1;min-height:0;gap:12px;padding:0 10px 2px;--online-side:0px}
 .boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:2px 8px;touch-action:manipulation}
-.board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bs);touch-action:manipulation;
-  grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--cols),1fr)}
+.board{display:grid;gap:var(--gap);width:var(--bs);height:var(--bh,var(--bs));touch-action:manipulation;
+  grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--rows,var(--cols)),1fr)}
 .online-tools{display:none;position:absolute;inset:0;z-index:5;pointer-events:none;padding:8px 10px;overflow:hidden}
 #s-game.online-mode .online-tools{display:block}
 #s-game.online-mode .gamebody{--online-side:0px}
@@ -486,7 +486,7 @@ body .lc-root{
 
 /* 牌面名稱：隨卡片寬度縮放，過小就不顯示（圖案本身已可辨識） */
 .card{container-type:inline-size}
-.board .card .card-label{padding:1px .3em 2px;border-width:1.5px;letter-spacing:0;border-radius:8px;font-size:clamp(6.2px,calc(13.5cqw - 1.2px),10.5px)}
+.board .card .card-label{padding:1px .3em 2px;border-width:1.5px;letter-spacing:0;border-radius:8px;font-size:clamp(8px,calc(13.5cqw - 1.2px),10.5px)}
 @container (max-width:40px){.card-label{display:none}}
 
 /* 記憶倒數提示：固定在頂列（離開鍵與右上角按鈕之間），不再蓋住玩家分數與牌面 */
@@ -595,3 +595,34 @@ body:has(.settings-modal.open) .language-controls,body:has(.settings-modal.open)
 
 /* v2h（第二輪 loop 1）：自訂房名可換行、完整顯示 */
 #room-title{white-space:normal;overflow-wrap:anywhere;text-overflow:clip;line-height:1.2}
+
+/* v2i：5 種棋盤選項卡；規則說明以換行字元刻意分成兩行 */
+.optcard .t{white-space:pre-line;line-height:1.25}
+#opt-size .optcard,#ropt-size .optcard{flex:1 1 112px;min-width:96px}
+
+/* v2j：長方形棋盤（4×6、6×8、6×10）不再套用正方形版面的假設 */
+@media (orientation:landscape) and (max-height:520px){
+  #s-game:has(.board[data-size="5"],.board[data-size="7"],.board[data-size="8"]) .gamebody{flex:1 1 0;min-height:0}
+}
+@media (orientation:portrait) and (max-width:820px){
+  #s-game:has(.board[data-size="5"],.board[data-size="7"],.board[data-size="8"]) .boardwrap{flex:1 1 0;aspect-ratio:auto;height:auto;min-height:300px}
+  #s-game:has(.board[data-size="5"],.board[data-size="7"],.board[data-size="8"]).online-mode .boardwrap{flex:0 0 auto;height:min(62vh,560px)}
+}
+
+/* v2k：盡量放大盤面可視空間（縮小邊距與頂底列高度） */
+.boardwrap{padding:2px 4px}
+.gamebody{padding-left:6px;padding-right:6px}
+@media (orientation:landscape) and (max-height:520px){
+  #s-game .gbar{padding-top:2px;padding-bottom:0}
+  #s-game .scorebar{padding-top:2px;padding-bottom:0}
+  #s-game .timerbar{margin:1px 12px 2px;height:16px}
+  #s-game .timerbar .num{font-size:.7rem;line-height:1;letter-spacing:.02em}
+  #s-game .gfoot{min-height:36px;padding:0 8px 2px;flex-wrap:nowrap}
+  #s-game .gfoot .btn3d{min-height:36px;padding:4px 12px calc(4px + var(--d))}
+  #s-game .boardwrap{padding:0 2px}
+}
+@media (orientation:portrait) and (max-width:820px){
+  #s-game .gamebody{padding:0 3px 4px;gap:4px}
+  #s-game .boardwrap{padding:2px}
+  #s-game .gfoot{padding:2px 10px 6px;min-height:0}
+}

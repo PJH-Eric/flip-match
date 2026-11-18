@@ -154,7 +154,9 @@ server.on('upgrade', (req, socket, head) => {
 /* ---------------- 遊戲大廳邏輯 ---------------- */
 const RULES = {
   4: { memory: 10, turn: 10, hints: 1 },
+  5: { memory: 15, turn: 15, hints: 1 },
   6: { memory: 20, turn: 20, hints: 2 },
+  7: { memory: 25, turn: 25, hints: 2 },
   8: { memory: 30, turn: 30, hints: 3 }
 };
 const DECK_IDS = ['animals', 'vehicles', 'fruits', 'characters', 'stationery', 'food', 'flags', 'numbers', 'phonetics', 'sports', 'mixed'];
@@ -214,7 +216,7 @@ function clearTimers(r) {
 
 function startGame(r) {
   const rule = RULES[r.size];
-  const pairs = (r.size * r.size) / 2;
+  const pairs = ({ 4: 8, 5: 12, 6: 18, 7: 24, 8: 30 })[r.size] || 8;
   const iconCount = DECK_ICON_COUNTS[r.deck] || ICONS_PER_DECK;
   var picks;
   if (SEQ_DECKS.indexOf(r.deck) >= 0) { picks = []; for (var pi = 0; pi < Math.min(pairs, iconCount); pi++) picks.push(pi); }
@@ -380,7 +382,7 @@ function handleClient(conn) {
       }
       case 'create': {
         if (cl.room) leaveRoom(cl, true);
-        const size = [4, 6, 8].indexOf(+m.size) >= 0 ? +m.size : 4;
+        const size = [4, 5, 6, 7, 8].indexOf(+m.size) >= 0 ? +m.size : 4;
         const deck = DECK_IDS.indexOf(m.deck) >= 0 ? m.deck : 'animals';
         const r = {
           id: uid('r'), name: String(m.roomName || (cl.name + ' 的房間')).slice(0, 16),
@@ -413,7 +415,7 @@ function handleClient(conn) {
       case 'setopt': {
         const r = cl.room;
         if (!r || r.players[0] !== cl || r.state === 'play') return;
-        if ([4, 6, 8].indexOf(+m.size) >= 0) r.size = +m.size;
+        if ([4, 5, 6, 7, 8].indexOf(+m.size) >= 0) r.size = +m.size;
         if (DECK_IDS.indexOf(m.deck) >= 0) r.deck = m.deck;
         if (m.first === 'host' || m.first === 'guest') r.first = m.first;
         r.players.forEach(p => { p.ready = false; });
