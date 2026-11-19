@@ -71,7 +71,8 @@
 
   function inviteUrl(roomId) {
     var base = location.href.split(/[?#]/)[0];
-    return base + '?room=' + encodeURIComponent(roomId);
+    var address = base + '?room=' + encodeURIComponent(roomId);
+    return window.GameBackend?.pinInvite(address) ?? address;
   }
 
   function clearChatLogs() {

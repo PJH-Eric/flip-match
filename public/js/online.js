@@ -26,7 +26,7 @@
     wantOpen = true;
     if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
     if (w.ServerOutage) w.ServerOutage.state('begin');
-    try { ws = new WebSocket(url()); } catch (e) { emit('status', 'bad'); return; }
+    try { ws = w.GameBackend?.createSocket(url()) ?? new WebSocket(url()); } catch (e) { emit('status', 'bad'); return; }
     emit('status', 'connecting');
     ws.onopen = function () {
       connected = true; retry = 0;
