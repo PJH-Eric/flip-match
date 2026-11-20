@@ -9,10 +9,12 @@ const publicDir = path.join(root, 'public');
 const read = (file) => fs.readFileSync(file, 'utf8');
 
 const html = read(path.join(publicDir, 'index.html'));
-const scriptSources = Array.from(html.matchAll(/<script src="([^"]+)"/g), (match) => match[1]);
-scriptSources.forEach((source) => {
-  assert.ok(fs.existsSync(path.join(publicDir, source.split('?')[0])), `找不到 index.html 引用的程式：${source}`);
-});
+const scriptSources = Array.from(html.matchAll(/<script src="([^"]+)"/g), (match) => match[1].split('?')[0]);
+const sharedRouter = '/game-lobby/backend-routing.js';
+assert.ok(scriptSources.includes(sharedRouter), 'index.html 必須載入共用後端路由');
+for (const source of scriptSources.filter((source) => source !== sharedRouter)) {
+  assert.ok(fs.existsSync(path.join(publicDir, source)), `找不到 index.html 引用的程式：${source}`);
+}
 
 const sandbox = {
   console,
