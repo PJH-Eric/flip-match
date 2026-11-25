@@ -44,6 +44,9 @@ jobs:
         with:
           path: public
 
+      - name: 等待 Pages artifact 完成索引
+        run: sleep 10
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
